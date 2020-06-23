@@ -207,11 +207,11 @@ def pf_scraper(poet_urls_dict, genre, time_sleep=1):
         
     return df
 
-def destringify(val):
+def destringify(x):
     '''Function found on Stack Overflow. Uses AST's literal_eval function to turn a list inside of a string into a list.
        Allows for errors, namely those caused by NaN values.
        (https://stackoverflow.com/questions/52232742/how-to-use-ast-literal-eval-in-a-pandas-dataframe-and-handle-exceptions)'''
     try:
-        return literal_eval(val)
+        return literal_eval(x)
     except (ValueError, SyntaxError) as e:
-        return val
+        return x
