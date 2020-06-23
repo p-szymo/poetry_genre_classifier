@@ -8,6 +8,7 @@ import requests as rq
 from bs4 import BeautifulSoup as bs
 from unicodedata import normalize
 import pytesseract
+from ast import literal_eval
 
 def poet_urls_by_genre(genre_code, max_page_num):
     '''Scraper for PoetryFoundation.org--scrapes urls for poets by genre.
@@ -111,8 +112,14 @@ def poem_scraper(poem_url):
         lines_raw = soup.find_all('div', {'style': 'text-indent: -1em; padding-left: 1em;'})
         lines = [normalize('NFKD', str(line.contents[0])) for line in lines_raw if line.contents]
         lines = [line.replace('<br/>', '') for line in lines]
-        line_pattern = '>(.*?)<'
-        lines = [re.search(line_pattern, line, re.I).group(1) if '<' in line else line for line in lines]
+        try:
+            line_pattern = '>(.*?)<'
+            lines = [re.search(line_pattern, line, re.I).group(1) if '<' in line else line for line in lines]
+        except:
+            try:
+                lines = [re.sub('<.*>', '', line) if '<' in line else line for line in lines]
+            except:
+                lines = np.nan
         if lines == []:
             try:
                 img_link = soup.find('img', src=re.compile('.*/jstor/.*'))['src']
@@ -124,8 +131,24 @@ def poem_scraper(poem_url):
                 lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
             except:
                 lines = np.nan
+        lines = [line.strip() for line in lines if line]
     except:
-        lines = np.nan
+        try:
+            lines_raw = soup.find_all('div', {'style': 'text-align: justify;'})
+            lines = [normalize('NFKD', str(line.contents[0])) for line in lines_raw if line.contents]
+            lines = [line.replace('<br/>', '') for line in lines]
+            lines = [line.strip() for line in lines if line]
+            if lines == []:
+                try:
+                    lines_raw = soup.find('div', {'data-view': 'PoemView'}).contents[1]
+                    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
+                    lines = [line.replace('<br/>', '') for line in lines]
+                    lines = [line.strip() for line in lines if line]
+                except:
+                    lines = np.nan
+        except:
+            lines = np.nan
+            
         
     try:
         poem_string = '\n'.join(lines)
@@ -183,3 +206,12 @@ def pf_scraper(poet_urls_dict, genre, time_sleep=1):
     df = pd.DataFrame(ultra_list)
         
     return df
+
+def destringify(val):
+    '''Function found on Stack Overflow. Uses AST's literal_eval function to turn a list inside of a string into a list.
+       Allows for errors, namely those caused by NaN values.
+       (https://stackoverflow.com/questions/52232742/how-to-use-ast-literal-eval-in-a-pandas-dataframe-and-handle-exceptions)'''
+    try:
+        return literal_eval(val)
+    except (ValueError, SyntaxError) as e:
+        return val
