@@ -148,11 +148,12 @@ def poem_scraper(poem_url):
     
     return info
 
-def pf_scraper(poet_urls_dict, genre):
+def pf_scraper(poet_urls_dict, genre, time_sleep=1):
     '''Scraper for PoetryFoundation.org--scrapes poet name, poem title, poem year, list of poem's lines,
        and the poem as a string.
        Input is a dictionary with genres as keys and urls to poets' pages as values, as well as the genre you wish to scrape.
            Designed to be used in a loop, so if there is an error along the way, you could feasibly have some progress saved.
+       Optional input of time to sleep between loop.
        Output is a Pandas DataFrame.'''
     
     # instantiate an empty list
@@ -177,7 +178,7 @@ def pf_scraper(poet_urls_dict, genre):
             ultra_list.append(info)
 
         # pause the for loop for a second to try to prevent being blocked
-        time.sleep(1)
+        time.sleep(time_sleep)
 
     df = pd.DataFrame(ultra_list)
         

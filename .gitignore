@@ -135,6 +135,15 @@ dmypy.json
 # DS Store
 .DS_Store
 
-# Datasets
+# notebooks
+temp_workbook.ipynb
+
+# folders
 /poems/*
 /poem_imgs/*
+
+# Datasets
+/data/poetry_foundation_raw-Copy1.csv
+/data/poetry_foundation_raw_addon-Copy1.csv
+/data/poetry_foundation_raw_first_pass.csv
+/data/poetry_foundation_raw_addon.csv
