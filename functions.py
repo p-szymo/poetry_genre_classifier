@@ -312,6 +312,20 @@ def center_rescraper(poem_url):
     poem_string = '\n'.join(lines_clean)
     return lines_clean, poem_string
 
+def image_rescraper(poem_url):
+    page = rq.get(poem_url)
+    soup = bs(page.content, 'html.parser')
+    img_link = soup.find('img', src=re.compile('.*/jstor/.*'))['src']
+    img_data = rq.get(img_link).content
+    with open('poem_imgs/temp.png', 'wb') as handle:
+        handle.write(img_data)
+    text = pytesseract.image_to_string('poem_imgs/temp.png')
+    scan_pattern = fr'POETRY\s*((.*\s.*)*)'
+    lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
+    lines = [line.strip() for line in lines if line]
+    poem_string = '\n'.join(lines)
+    return lines, poem_string
+
 
 def destringify(x):
     '''Function found on Stack Overflow. Uses AST's literal_eval function to turn a list inside of a string into a list.
