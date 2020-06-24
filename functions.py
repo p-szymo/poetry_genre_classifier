@@ -207,6 +207,112 @@ def pf_scraper(poet_urls_dict, genre, time_sleep=1):
         
     return df
 
+# BELOW IS A SERIES OF RESCRAPER FUNCTIONS FOR SPECIFIC CASES THAT SHOULD IDEALLY BE BUILT INTO THE LARGER FUNCTION ABOVE
+def poempara_rescraper(poem_url):
+    page = rq.get(poem_url)
+    soup = bs(page.content, 'html.parser')
+    lines_raw = soup.find_all('div', {'class': 'poempara'})
+    lines = [normalize('NFKD', str(line.contents[-1])) for line in lines_raw if line.contents]
+    lines = [line.replace('<br/>', '') for line in lines]
+    line_pattern = '>(.*?)<'
+    lines = [re.search(line_pattern, line, re.I).group(1) if '<' in line else line for line in lines]
+    lines = [line.strip() for line in lines if line]
+    poem_string = '\n'.join(lines)
+    return lines, poem_string
+
+def PoemView_rescraper(poem_url):
+    page = rq.get(poem_url)
+    soup = bs(page.content, 'html.parser')
+    lines_raw = soup.find('div', {'data-view': 'PoemView'}).contents
+    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
+    lines = [line.replace('<br/>', '') for line in lines]
+    lines = [line.strip() for line in lines if line.strip()]
+    line_pattern = '>(.*?)<'
+    lines_clean = []
+    for line in lines:
+        if '<' in line:
+            try:
+                lines_clean.append(re.search(line_pattern, line, re.I).group(1).strip())
+            except:
+                continue
+        else:
+            lines_clean.append(line.strip())
+    poem_string = '\n'.join(lines_clean)
+    return lines_clean, poem_string
+
+def ranged_rescraper(poem_url):
+    page = rq.get(poem_url)
+    soup = bs(page.content, 'html.parser')
+    lines_raw = soup.find_all('div', {'style': 'text-indent: -1em; padding-left: 1em;'})
+    lines = [normalize('NFKD', str(line.contents[-1])) for line in lines_raw if line.contents]
+    lines = [line.replace('<br/>', '') for line in lines]
+    line_pattern = '>(.*?)<'
+    lines = [re.search(line_pattern, line, re.I).group(1) if '<' in line else line for line in lines]
+    lines = [line.strip() for line in lines if line]
+    poem_string = '\n'.join(lines)
+    return lines, poem_string
+
+def modified_regular_rescraper(poem_url):
+    page = rq.get(poem_url)
+    soup = bs(page.content, 'html.parser')
+    lines_raw = soup.find_all('div', {'style': 'text-indent: -1em; padding-left: 1em;'})[0]
+    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
+    lines = [line.replace('<br/>', '') for line in lines]
+    lines = [line.strip() for line in lines if line.strip()]
+    line_pattern = '>(.*?)<'
+    lines_clean = []
+    for line in lines:
+        if '<' in line:
+            try:
+                lines_clean.append(re.search(line_pattern, line, re.I).group(1).strip())
+            except:
+                continue
+        else:
+            lines_clean.append(line.strip())
+    poem_string = '\n'.join(lines_clean)
+    return lines_clean, poem_string
+
+def justify_rescraper(poem_url):
+    page = rq.get(poem_url)
+    soup = bs(page.content, 'html.parser')
+    lines_raw = soup.find('div', {'style': 'text-align: justify;'}).contents
+    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
+    lines = [line.replace('<br/>', '') for line in lines]
+    lines = [line.strip() for line in lines if line.strip()]
+    line_pattern = '>(.*?)<'
+    lines_clean = []
+    for line in lines:
+        if '<' in line:
+            try:
+                lines_clean.append(re.search(line_pattern, line, re.I).group(1).strip())
+            except:
+                continue
+        else:
+            lines_clean.append(line.strip())
+    poem_string = '\n'.join(lines_clean)
+    return lines_clean, poem_string
+
+def center_rescraper(poem_url):
+    page = rq.get(poem_url)
+    soup = bs(page.content, 'html.parser')
+    lines_raw = soup.find_all('div', {'style': 'text-align: center;'})
+    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
+    lines = [line.replace('<br/>', '') for line in lines]
+    lines = [line.strip() for line in lines if line.strip()]
+    line_pattern = '>(.*?)<'
+    lines_clean = []
+    for line in lines:
+        if '<' in line:
+            try:
+                lines_clean.append(re.search(line_pattern, line, re.I).group(1).strip())
+            except:
+                continue
+        else:
+            lines_clean.append(line.strip())
+    poem_string = '\n'.join(lines_clean)
+    return lines_clean, poem_string
+
+
 def destringify(x):
     '''Function found on Stack Overflow. Uses AST's literal_eval function to turn a list inside of a string into a list.
        Allows for errors, namely those caused by NaN values.
@@ -215,3 +321,4 @@ def destringify(x):
         return literal_eval(x)
     except (ValueError, SyntaxError) as e:
         return x
+    
