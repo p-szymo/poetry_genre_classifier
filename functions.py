@@ -322,3 +322,15 @@ def destringify(x):
     except (ValueError, SyntaxError) as e:
         return x
     
+def line_cleaner(lines):
+    '''Input lines of a poem. Function strips poem of white space and removes empty lines.
+       Output cleaned up lines.'''
+    lines_clean = [line.strip() for line in lines]
+    lines_clean = [line for line in lines_clean if line]
+    return lines_clean
+
+def line_averager(lines):
+    num_lines = len(lines)
+    line_count = [len(line.split()) for line in lines]
+    word_count = sum(line_count)
+    return word_count / num_lines
