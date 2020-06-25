@@ -145,3 +145,5 @@ temp_workbook.ipynb
 # Datasets
 /data/poetry_foundation_raw.csv
 /data/poetry_foundation_raw_first_pass.csv
+/data/poetry_foundation_clean.csv
+/data/poetry_foundation_genres_first_features.csv

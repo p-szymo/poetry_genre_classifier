@@ -398,9 +398,14 @@ def image_rescraper_title(poem_url, title):
         lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
         lines = [line.strip() for line in lines if line]
     except:
-        scan_pattern = fr'{title.split()[-1].upper()}\s*((.*\s.*)*)'
-        lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
-        lines = [line.strip() for line in lines if line]
+        try:
+            scan_pattern = fr'{title.split()[-1].upper()}\s*((.*\s.*)*)'
+            lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
+            lines = [line.strip() for line in lines if line]
+        except:
+            scan_pattern = fr'{title.split()[0].upper()}\s*((.*\s.*)*)'
+            lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
+            lines = [line.strip() for line in lines if line]
     poem_string = '\n'.join(lines)
     return lines, poem_string
 
