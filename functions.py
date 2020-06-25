@@ -1,413 +1,16 @@
 import pandas as pd
 import numpy as np
 
-from selenium import webdriver
 import re
-import time
-import requests as rq
-from bs4 import BeautifulSoup as bs
-from unicodedata import normalize
-import pytesseract
+import string
 from ast import literal_eval
 
-def poet_urls_by_genre(genre_code, max_page_num):
-    '''Scraper for PoetryFoundation.org--scrapes urls for poets by genre.
-       Input genre code and maximum number of pages to iterate through.
-       Outputs a list of urls for each poet within the specified parameters.
-       NOTE: Selenium is known to encounter issues, so sometimes this code does not work properly. Try re-running if output
-             is not as expected.'''
-    
-    # url requirements
-    base_url = 'https://www.poetryfoundation.org/poets/browse#page='
-    genre_addon = '&sort_by=last_name&school-period='
-    
-    # create empty list
-    poet_urls = []
-    # loop through desired number of pages
-    for i in range(1,max_page_num):
-        try: 
-            # instantiate a selenium browser
-            driver = webdriver.Chrome()
-            # load webpage
-            driver.get(f'{base_url}{i}{genre_addon}{genre_code}')
-            # find all links
-            hrefs = driver.find_elements_by_xpath("//*[@href]")
-            # find only links that match pattern for poet url
-            pattern = re.compile('^.*/poets/(?!browse)[a-z\-]*$')
-            poet_urls_by_page = [href.get_attribute('href') for href in hrefs if pattern.match(href.get_attribute('href'))]
-            
-            # only extend the list if there is something to extend
-            if poet_urls_by_page:
-                poet_urls.extend(poet_urls_by_page)
-                # manually create some time between selenium browser, to decrease chance of errors or IP block
-                time.sleep(2.5)
-            else:
-                break
-        # NOTE: a more specific except protocol may allow one to not have to re-run this code, could re-run the code
-        #       until all possible links are grabbed
-        except:
-            break
-            
-    return poet_urls
-
-def poem_urls_scraper(poet_url):
-    '''Scraper for PoetryFoundation.org--scrapes poem urls by poet.
-       Input the url for a poet's page on PoetryFoundation.org.
-       Output two lists: first, a list of urls for text poems; second, a list of urls for poems that are scans of the original
-       magazine page.'''
-    
-    # load a page and soupify it
-    page = rq.get(poet_url)
-    soup = bs(page.content, 'html.parser')
-    
-    # find all links that fit a certain pattern
-    # finds links to poems that are text and easily scraped
-    poems_text = soup.find_all('a',
-                               href=re.compile('https://www.poetryfoundation.org/poems/[0-9]+/.*'),
-                               attrs={'class': None})
-    # finds links to poems that are images
-    poems_scan = soup.find_all('a',
-                               href=re.compile('https://www.poetryfoundation.org/poetrymagazine/poems/[0-9]+/.*'),
-                               attrs={'class': None})
-    
-    # turn into lists
-    if poems_text:
-        poems_text_urls = [poem.get('href') for poem in poems_text]
-    else:
-        poems_text_urls = []
-        
-    if poems_scan:
-        poems_scan_urls = [poem.get('href') for poem in poems_scan]
-    else:
-        poems_scan_urls = []
-    
-    return poems_text_urls, poems_scan_urls
-
-def poem_scraper(poem_url):
-    '''Scraper for PoetryFoundation.org--scrapes poet name, poem title, poem year, list of poem's lines,
-       and the poem as a string.
-       Input the url for a poem's page on PoetryFoundation.org.
-       Output is a list.'''
-    
-    # load a page and soupify it
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    
-    # series of try/except statements to scrape info or return NaN value if desired info cannot be scraped
-    try:
-        poet = soup.find('a', href=re.compile('.*/poets/.*')).contents[0]
-    except:
-        poet = np.nan
-        
-    try:
-        title = soup.find('h1').contents[-1].strip()
-    except:
-        try:
-            title_pattern = '[a-z\-]*$'
-            title = re.search(title_pattern, poem_url, re.I).group().replace('-', ' ').title()
-        except:
-            title = np.nan
-        
-    try:
-        lines_raw = soup.find_all('div', {'style': 'text-indent: -1em; padding-left: 1em;'})
-        lines = [normalize('NFKD', str(line.contents[0])) for line in lines_raw if line.contents]
-        lines = [line.replace('<br/>', '') for line in lines]
-        try:
-            line_pattern = '>(.*?)<'
-            lines = [re.search(line_pattern, line, re.I).group(1) if '<' in line else line for line in lines]
-        except:
-            try:
-                lines = [re.sub('<.*>', '', line) if '<' in line else line for line in lines]
-            except:
-                lines = np.nan
-        if lines == []:
-            try:
-                img_link = soup.find('img', src=re.compile('.*/jstor/.*'))['src']
-                img_data = rq.get(img_link).content
-                with open('poem_imgs/temp.png', 'wb') as handle:
-                    handle.write(img_data)
-                text = pytesseract.image_to_string('poem_imgs/temp.png')
-                scan_pattern = fr'{title.upper()}\s*((.*\s.*)*)'
-                lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
-            except:
-                lines = np.nan
-        lines = [line.strip() for line in lines if line]
-    except:
-        try:
-            lines_raw = soup.find_all('div', {'style': 'text-align: justify;'})
-            lines = [normalize('NFKD', str(line.contents[0])) for line in lines_raw if line.contents]
-            lines = [line.replace('<br/>', '') for line in lines]
-            lines = [line.strip() for line in lines if line]
-            if lines == []:
-                try:
-                    lines_raw = soup.find('div', {'data-view': 'PoemView'}).contents[1]
-                    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
-                    lines = [line.replace('<br/>', '') for line in lines]
-                    lines = [line.strip() for line in lines if line]
-                except:
-                    lines = np.nan
-        except:
-            lines = np.nan
-            
-        
-    try:
-        poem_string = '\n'.join(lines)
-    except:
-        poem_string = np.nan
-        
-    try:
-        year_blurb = soup.find('span', {'class': 'c-txt c-txt_note c-txt_note_mini'}).contents[2]
-        year_pattern = r'[12]\d{3}'
-        year = int(re.search(year_pattern, year_blurb, re.I).group())
-    except:
-        try:
-            year_blurb = soup.find_all('span', {'class': 'c-txt c-txt_note c-txt_note_mini'})[-1].contents[2]
-            year_pattern = r'[12]\d{3}'
-            year = int(re.search(year_pattern, year_blurb, re.I).group())
-        except:
-            year = np.nan
-    
-    info = [poet, title, year, lines, poem_string]
-    
-    return info
-
-def pf_scraper(poet_urls_dict, genre, time_sleep=1):
-    '''Scraper for PoetryFoundation.org--scrapes poet name, poem title, poem year, list of poem's lines,
-       and the poem as a string.
-       Input is a dictionary with genres as keys and urls to poets' pages as values, as well as the genre you wish to scrape.
-           Designed to be used in a loop, so if there is an error along the way, you could feasibly have some progress saved.
-       Optional input of time to sleep between loop.
-       Output is a Pandas DataFrame.'''
-    
-    # instantiate an empty list
-    ultra_list = []
-    
-    # set up a for loop to iterate through urls in genre
-    for poet_url in poet_urls_dict[genre]:
-        
-        # scrape urls for both types of pages, text poems and scanned poems
-        poem_text_urls, poem_scan_urls = poem_urls_scraper(poet_url)
-
-        # instantiate a list with url and genre info, then scrape the rest of the info using earlier function,
-        # then add it to the list that will get converted into a dataframe
-        for poem_url in poem_text_urls:
-            info = [poet_url, genre, poem_url]
-            info.extend(poem_scraper(poem_url))
-            ultra_list.append(info)
-
-        for poem_url in poem_scan_urls:
-            info = [poet_url, genre, poem_url]
-            info.extend(poem_scraper(poem_url))
-            ultra_list.append(info)
-
-        # pause the for loop for a second to try to prevent being blocked
-        time.sleep(time_sleep)
-
-    df = pd.DataFrame(ultra_list)
-        
-    return df
-
-# BELOW IS A SERIES OF RESCRAPER FUNCTIONS FOR SPECIFIC CASES THAT SHOULD IDEALLY BE BUILT INTO THE LARGER FUNCTION ABOVE
-def poempara_rescraper(poem_url):
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    lines_raw = soup.find_all('div', {'class': 'poempara'})
-    lines = [normalize('NFKD', str(line.contents[-1])) for line in lines_raw if line.contents]
-    lines = [line.replace('<br/>', '') for line in lines]
-    line_pattern = '>(.*?)<'
-    lines = [re.search(line_pattern, line, re.I).group(1) if '<' in line else line for line in lines]
-    lines = [line.strip() for line in lines if line]
-    poem_string = '\n'.join(lines)
-    return lines, poem_string
-
-def PoemView_rescraper(poem_url):
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    lines_raw = soup.find('div', {'data-view': 'PoemView'}).contents
-    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
-    lines = [line.replace('<br/>', '') for line in lines]
-    lines = [line.strip() for line in lines if line.strip()]
-    line_pattern = '>(.*?)<'
-    lines_clean = []
-    for line in lines:
-        if '<' in line:
-            try:
-                lines_clean.append(re.search(line_pattern, line, re.I).group(1).strip())
-            except:
-                continue
-        else:
-            lines_clean.append(line.strip())
-    poem_string = '\n'.join(lines_clean)
-    return lines_clean, poem_string
-
-def ranged_rescraper(poem_url):
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    lines_raw = soup.find_all('div', {'style': 'text-indent: -1em; padding-left: 1em;'})
-    lines = [normalize('NFKD', str(line.contents[-1])) for line in lines_raw if line.contents]
-    lines = [line.replace('<br/>', '') for line in lines]
-    line_pattern = '>(.*?)<'
-    lines = [re.search(line_pattern, line, re.I).group(1) if '<' in line else line for line in lines]
-    lines = [line.strip() for line in lines if line]
-    poem_string = '\n'.join(lines)
-    return lines, poem_string
-
-def modified_regular_rescraper(poem_url):
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    lines_raw = soup.find_all('div', {'style': 'text-indent: -1em; padding-left: 1em;'})[0]
-    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
-    lines = [line.replace('<br/>', '') for line in lines]
-    lines = [line.strip() for line in lines if line.strip()]
-    line_pattern = '>(.*?)<'
-    lines_clean = []
-    for line in lines:
-        if '<' in line:
-            try:
-                lines_clean.append(re.search(line_pattern, line, re.I).group(1).strip())
-            except:
-                continue
-        else:
-            lines_clean.append(line.strip())
-    poem_string = '\n'.join(lines_clean)
-    return lines_clean, poem_string
-
-def justify_rescraper(poem_url):
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    lines_raw = soup.find('div', {'style': 'text-align: justify;'}).contents
-    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
-    lines = [line.replace('<br/>', '') for line in lines]
-    lines = [line.strip() for line in lines if line.strip()]
-    line_pattern = '>(.*?)<'
-    lines_clean = []
-    for line in lines:
-        if '<' in line:
-            try:
-                lines_clean.append(re.search(line_pattern, line, re.I).group(1).strip())
-            except:
-                continue
-        else:
-            lines_clean.append(line.strip())
-    poem_string = '\n'.join(lines_clean)
-    return lines_clean, poem_string
-
-def center_rescraper(poem_url):
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    lines_raw = soup.find_all('div', {'style': 'text-align: center;'})
-    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
-    lines = [line.replace('<br/>', '') for line in lines]
-    lines = [line.strip() for line in lines if line.strip()]
-    line_pattern = '>(.*?)<'
-    lines_clean = []
-    for line in lines:
-        if '<' in line:
-            try:
-                lines_clean.append(re.search(line_pattern, line, re.I).group(1).strip())
-            except:
-                continue
-        else:
-            lines_clean.append(line.strip())
-    poem_string = '\n'.join(lines_clean)
-    return lines_clean, poem_string
-
-def p_rescraper_all(poem_url):
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    lines_raw = soup.find_all('p')[:-1]
-    lines = [normalize('NFKD', str(line.contents[0])) for line in lines_raw if line]
-    lines = [line.replace('<br/>', '') for line in lines]
-    lines = [line.strip() for line in lines if line.strip()]
-    line_pattern = '>(.*?)<'
-    lines_clean = []
-    for line in lines:
-        if '<' in line:
-            try:
-                lines_clean.append(re.search(line_pattern, line, re.I).group(1).strip())
-            except:
-                continue
-        else:
-            lines_clean.append(line.strip())
-    poem_string = '\n'.join(lines_clean)
-    return lines_clean, poem_string
-
-def p_rescraper_2(poem_url):
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    lines_raw = soup.find_all('p')[2].contents
-    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
-    lines = [line.replace('<br/>', '') for line in lines]
-    lines = [line.strip() for line in lines if line.strip()]
-    line_pattern = '>(.*?)<'
-    lines_clean = []
-    for line in lines:
-        if '<' in line:
-            try:
-                lines_clean.append(re.search(line_pattern, line, re.I).group(1).strip())
-            except:
-                continue
-        else:
-            lines_clean.append(line.strip())
-    poem_string = '\n'.join(lines_clean)
-    return lines_clean, poem_string
-
-def image_rescraper_POETRY(poem_url):
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    img_link = soup.find('img', src=re.compile('.*/jstor/.*'))['src']
-    img_data = rq.get(img_link).content
-    with open('poem_imgs/temp.png', 'wb') as handle:
-        handle.write(img_data)
-    text = pytesseract.image_to_string('poem_imgs/temp.png')
-    scan_pattern = r'POETRY\s*((.*\s.*)*)'
-    lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
-    lines = [line.strip() for line in lines if line]
-    poem_string = '\n'.join(lines)
-    return lines, poem_string
-
-def image_rescraper_poet(poem_url, poet):
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    img_link = soup.find('img', src=re.compile('.*/jstor/.*'))['src']
-    img_data = rq.get(img_link).content
-    with open('poem_imgs/temp.png', 'wb') as handle:
-        handle.write(img_data)
-    text = pytesseract.image_to_string('poem_imgs/temp.png')
-    try:
-        scan_pattern = fr'{poet.upper()}\s*((.*\s.*)*)'
-        lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
-        lines = [line.strip() for line in lines if line]
-    except:
-        scan_pattern = fr'{poet.split()[0].upper()}\s*((.*\s.*)*)'
-        lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
-        lines = [line.strip() for line in lines if line]
-    poem_string = '\n'.join(lines)
-    return lines, poem_string
-
-def image_rescraper_title(poem_url, title):
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    img_link = soup.find('img', src=re.compile('.*/jstor/.*'))['src']
-    img_data = rq.get(img_link).content
-    with open('poem_imgs/temp.png', 'wb') as handle:
-        handle.write(img_data)
-    text = pytesseract.image_to_string('poem_imgs/temp.png')
-    try:
-        scan_pattern = fr'{title.upper()}\s*((.*\s.*)*)'
-        lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
-        lines = [line.strip() for line in lines if line]
-    except:
-        try:
-            scan_pattern = fr'{title.split()[-1].upper()}\s*((.*\s.*)*)'
-            lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
-            lines = [line.strip() for line in lines if line]
-        except:
-            scan_pattern = fr'{title.split()[0].upper()}\s*((.*\s.*)*)'
-            lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
-            lines = [line.strip() for line in lines if line]
-    poem_string = '\n'.join(lines)
-    return lines, poem_string
+import nltk
+from nltk import RegexpTokenizer
+from nltk.stem import WordNetLemmatizer 
+from nltk.corpus import stopwords
+from nltk.corpus import wordnet
+from textblob import TextBlob as tb
 
 def destringify(x):
     '''Function found on Stack Overflow. Uses AST's literal_eval function to turn a list inside of a string into a list.
@@ -430,3 +33,213 @@ def line_averager(lines):
     line_count = [len(line.split()) for line in lines]
     word_count = sum(line_count)
     return word_count / num_lines
+
+# self-defined contractions
+def load_dict_contractions():
+    '''Dictionary of contractions as keys and their expanded words as values.'''
+    
+    return {
+        "ain't": "is not",
+        "amn't": "am not",
+        "aren't": "are not",
+        "can't": "cannot",
+        "can't've": "cannot have",
+        "'cause": "because",
+        "cuz": "because",
+        "couldn't": "could not",
+        "couldn't've": "could not have",
+        "could've": "could have",
+        "daren't": "dare not",
+        "daresn't": "dare not",
+        "dasn't": "dare not",
+        "didn't": "did not",
+        "doesn't": "does not",
+        "don't": "do not",
+        "d'you": "do you",
+        "e'er": "ever",
+        "em": "them",
+        "'em": "them",
+        "everyone's": "everyone is",
+        "finna": "fixing to",
+        "gimme": "give me",
+        "gonna": "going to",
+        "gon't": "go not",
+        "gotta": "got to",
+        "hadn't": "had not",
+        "hadn't've": "had not have",
+        "hasn't": "has not",
+        "haven't": "have not",
+        "he'd": "he would",
+        "he'd've": "he would have",
+        "he'll": "he will",
+        "he'll've": "he he will have",
+        "he's": "he is",
+        "how'd": "how would",
+        "how'll": "how will",
+        "how're": "how are",
+        "how's": "how is",
+        "i'd": "i would",
+        "i'd've": "i would have",
+        "i'll": "i will",
+        "i'll've": "i will have",
+        "i'm": "i am",
+        "i'm'a": "i am about to",
+        "i'm'o": "i am going to",
+        "isn't": "is not",
+        "it'd": "it would",
+        "it'd've": "it would have",
+        "it'll": "it will",
+        "it'll've": "it will have",
+        "it's": "it is",
+        "i've": "i have",        
+        "kinda": "kind of",
+        "let's": "let us",
+        "ma'am": "madam",
+        "mayn't": "may not",
+        "may've": "may have",
+        "mightn't": "might not",
+        "mightn't've": "might not have",
+        "might've": "might have",
+        "mustn't": "must not",
+        "mustn't've": "must not have",
+        "must've": "must have",
+        "needn't": "need not",
+        "needn't've": "need not have",
+        "ne'er": "never",
+        "o'": "of",
+        "o'clock": "of the clock",
+        "o'er": "over",
+        "ol'": "old",
+        "oughtn't": "ought not",
+        "oughtn't've": "ought not have",                
+        "shalln't": "shall not",
+        "shan't": "shall not",
+        "shan't've": "shall not have",
+        "she'd": "she would",
+        "she'd've": "she would have",
+        "she'll": "she will",
+        "she'll've": "she will have",
+        "she's": "she is",
+        "shouldn't": "should not",
+        "shouldn't've": "should not have",
+        "should've": "should have",
+        "so's": "so as",
+        "so've": "so have",
+        "somebody's": "somebody is",
+        "someone's": "someone is",
+        "something's": "something is",
+        "that'd": "that would",
+        "that'd've": "that would have",
+        "that'll": "that will",
+        "that're": "that are",
+        "that's": "that is",
+        "there'd": "there would",
+        "there'd've": "there would have",
+        "there'll": "there will",
+        "there're": "there are",
+        "there's": "there is",
+        "these're": "these are",
+        "they'd": "they would",
+        "they'd've": "they would have",
+        "they'll": "they will",
+        "they'll've": "they will have",
+        "they're": "they are",
+        "they've": "they have",
+        "this's": "this is",
+        "those're": "those are",
+        "to've": "to have",
+        "'tis": "it is",
+        "tis": "it is",
+        "'twas": "it was",
+        "twas": "it was",
+        "wanna": "want to",
+        "wasn't": "was not",
+        "we'd": "we would",
+        "we'd've": "we would have",
+        "we'll": "we will",
+        "we'll've": "we will have",
+        "we're": "we are",
+        "weren't": "were not",
+        "we've": "we have",
+        "what'd": "what did",
+        "what'll": "what will",
+        "what'll've": "what will have",
+        "what're": "what are",
+        "what's": "what is",
+        "what've": "what have",
+        "when's": "when is",
+        "when've": "when have",
+        "where'd": "where did",
+        "where're": "where are",
+        "where's": "where is",
+        "where've": "where have",
+        "which's": "which is",
+        "will've": "will have",
+        "who'd": "who would",
+        "who'd've": "who would have",
+        "who'll": "who will",
+        "who'll've": "who will have",
+        "who're": "who are",
+        "who's": "who is",
+        "who've": "who have",
+        "why'd": "why did",
+        "why're": "why are",
+        "why've": "why have",
+        "why's": "why is",
+        "won't": "will not",
+        "won't've": "will not have",
+        "wouldn't": "would not",
+        "wouldn't've": "would not have",
+        "would've": "would have",
+        "y'all": "you all",
+        "y'all'd": "you all would",
+        "y'all'd've": "you all would have",
+        "y'all're": "you all are",
+        "y'all've": "you all have",
+        "you'd": "you would",
+        "you'd've": "you would have",
+        "you'll": "you will",
+        "you'll've": "you will have",
+        "you're": "you are",
+        "you've": "you have",
+        }
+
+def get_wordnet_pos(word):
+    '''Map POS tag to first character lemmatize() accepts.
+       Function taken from https://www.machinelearningplus.com/nlp/lemmatization-examples-python/'''
+    tag = nltk.pos_tag([word])[0][1][0].upper()
+    tag_dict = {"J": wordnet.ADJ,
+                "N": wordnet.NOUN,
+                "V": wordnet.VERB,
+                "R": wordnet.ADV}
+
+    return tag_dict.get(tag, wordnet.NOUN)
+
+# Apply text cleaning techniques
+def clean_text(text, stop_words):
+    '''Make text lowercase, remove mentions, remove links, convert emoticons/emojis to words, remove punctuation
+    (except apostrophes), tokenize words (including contractions), convert contractions to full words,
+    remove stop words.'''
+    
+    # make text lowercase
+    text = text.lower().replace("’", "'")
+
+    # initial tokenization to remove non-words
+    tokenizer = RegexpTokenizer("([a-z]+(?:'[a-z]+)?)")
+    words = tokenizer.tokenize(text)
+
+    # convert contractions
+    contractions = load_dict_contractions()
+    words = [contractions[word] if word in contractions else word for word in words]
+    text = ' '.join(words)
+
+    # remove stop words, lemmatize using POS tags, and remove two-letter words
+    lemmatizer = WordNetLemmatizer()
+    words = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in nltk.word_tokenize(text) \
+             if word not in stop_words]
+    # removing any words that got lemmatized into a stop word
+    words = [word for word in words if word not in stop_words]
+    words = [word for word in words if len(word) > 2]
+    text = ' '.join(words)
+    
+    return text
