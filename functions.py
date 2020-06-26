@@ -12,6 +12,8 @@ from nltk.corpus import stopwords
 from nltk.corpus import wordnet
 from textblob import TextBlob as tb
 
+import pronouncing
+
 def destringify(x):
     '''Function found on Stack Overflow. Uses AST's literal_eval function to turn a list inside of a string into a list.
        Allows for errors, namely those caused by NaN values.
@@ -21,18 +23,73 @@ def destringify(x):
     except (ValueError, SyntaxError) as e:
         return x
     
+
+def roman_numerals():
+    '''Returns a list of roman numerals, 1-100.'''
+    return [
+            'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI',
+            'XVII', 'XVIII', 'XIX', 'XX', 'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI', 'XXVII', 'XXVIII', 'XXIX',
+            'XXX', 'XXXI', 'XXXII', 'XXXIII', 'XXXIV', 'XXXV', 'XXXVI', 'XXXVII', 'XXXVIII', 'XXXIX', 'XL', 'XLI',
+            'XLII', 'XLIII', 'XLIV', 'XLV', 'XLVI', 'XLVII', 'XLVIII', 'XLIX', 'L', 'LI', 'LII', 'LIII', 'LIV', 'LV',
+            'LVI', 'LVII', 'LVIII', 'LIX', 'LX', 'LXI', 'LXII', 'LXIII', 'LXIV', 'LXV', 'LXVI', 'LXVII', 'LXVIII',
+            'LXIX', 'LXX', 'LXXI', 'LXXII', 'LXXIII', 'LXXIV', 'LXXV', 'LXXVI', 'LXXVII', 'LXXVIII', 'LXXIX', 'LXXX',
+            'LXXXI', 'LXXXII', 'LXXXIII', 'LXXXIV', 'LXXXV', 'LXXXVI', 'LXXXVII', 'LXXXVIII', 'LXXXIX', 'XC', 'XCI',
+            'XCII', 'XCIII', 'XCIV', 'XCV', 'XCVI', 'XCVII', 'XCVIII', 'XCIX', 'C'
+        ]
+
 def line_cleaner(lines):
     '''Input lines of a poem. Function strips poem of white space and removes empty lines.
        Output cleaned up lines.'''
+    # remove spaces at beginning and end of lines
     lines_clean = [line.strip() for line in lines]
+    # create a list of section headers to remove
+    section_headers = roman_numerals()
+    section_headers += [str(i) for i in range(1,101)]
+    section_headers += [f'[{i}]' for i in range(1,101)]
+    section_headers += [f'[{i}]' for i in range(1,101)]
+    section_headers += [f'PART {num}' for num in roman_numerals()]
+    section_headers += [f'PART {i}' for i in range(1,101)]
+    lines_clean = [line for line in lines_clean if line not in section_headers]
+    # remove any empty strings
     lines_clean = [line for line in lines_clean if line]
+    
     return lines_clean
 
 def line_averager(lines):
+    '''Input a list of cleaned up lines.
+       Output the average number of words per line.'''
+    # calculate number of lines
     num_lines = len(lines)
+    # calculate the number of total words in the poem
     line_count = [len(line.split()) for line in lines]
     word_count = sum(line_count)
+    # return the average
     return word_count / num_lines
+
+def rhyme_endline_counter(lines):
+    '''Input a list of lines.
+       Output the number of end rhymes, i.e. rhymes that happen at the end of the line.'''
+    # instantiate an empty dictionary
+    rhymes = {}
+    # make a list of words at the end of the line
+    end_words = [line.split()[-1].translate(str.maketrans('', '', string.punctuation)) for line in lines]
+    # for loop to build the dictionary
+    for word in end_words:
+        for i in range(len(end_words)):
+            # check if a word rhymes with another word in the list
+            if end_words[i] in pronouncing.rhymes(word):
+                # check if word is already a key in the dictionary
+                if word not in rhymes:
+                    # or if its rhyming word is already a key in the dictionary
+                    if end_words[i] not in rhymes:
+                        # if neither is, create the word as key and it's rhyme as a value (in a list)
+                        rhymes[word] = [end_words[i]]
+                else:
+                    # if word is already a key, append its rhyme to its value
+                    rhymes[word].append(end_words[i])
+    # count up the amount of (unique) rhymes per word
+    rhyme_counts = [len(rhyme) for rhyme in rhymes.values()]
+    return sum(rhyme_counts)
 
 # self-defined contractions
 def load_dict_contractions():
@@ -237,6 +294,7 @@ def clean_text(text, stop_words):
     lemmatizer = WordNetLemmatizer()
     words = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in nltk.word_tokenize(text) \
              if word not in stop_words]
+    
     # removing any words that got lemmatized into a stop word
     words = [word for word in words if word not in stop_words]
     words = [word for word in words if len(word) > 2]
