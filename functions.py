@@ -55,25 +55,14 @@ def line_cleaner(lines):
     
     return lines_clean
 
-def line_averager(lines):
-    '''Input a list of cleaned up lines.
-       Output the average number of words per line.'''
-    # calculate number of lines
-    num_lines = len(lines)
-    # calculate the number of total words in the poem
-    line_count = [len(line.split()) for line in lines]
-    word_count = sum(line_count)
-    # return the average
-    return word_count / num_lines
-
 def word_counter(lines):
     '''Input a list of strings; count the words within each string.
        Output the total number of words across all strings.'''
-    total = []
-    for line in lines:
-        words = [word for word in line.split()]
-        total.append(len(words))
-    return sum(total)
+    # calculate the number of words per line
+    line_count = [len(line.split()) for line in lines]
+    # add up the line word counts
+    word_count = sum(line_count)
+    return word_count
 
 def end_rhyme_counter(lines):
     '''Input a list of lines.
