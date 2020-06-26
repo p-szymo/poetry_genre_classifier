@@ -66,7 +66,16 @@ def line_averager(lines):
     # return the average
     return word_count / num_lines
 
-def rhyme_endline_counter(lines):
+def word_counter(lines):
+    '''Input a list of strings; count the words within each string.
+       Output the total number of words across all strings.'''
+    total = []
+    for line in lines:
+        words = [word for word in line.split()]
+        total.append(len(words))
+    return sum(total)
+
+def end_rhyme_counter(lines):
     '''Input a list of lines.
        Output the number of end rhymes, i.e. rhymes that happen at the end of the line.'''
     # instantiate an empty dictionary
@@ -90,6 +99,27 @@ def rhyme_endline_counter(lines):
     # count up the amount of (unique) rhymes per word
     rhyme_counts = [len(rhyme) for rhyme in rhymes.values()]
     return sum(rhyme_counts)
+
+def syllable_counter(lines):
+    '''Input list of strings, each of which will have its syllables counted.
+       Output the total number of syllables in the input list.
+       NOTE: does not factor in multi-syllabic digits, times (ex. 1:03), and most likely other non-"word" words.
+       Created around Allison Parrish example in documention for her library, pronouncing.
+       (https://pronouncing.readthedocs.io/en/latest/tutorial.html#counting-syllables)'''
+    # create empty list
+    total = []
+    # loop over list
+    for line in lines:
+        # turn each word into a string of its phonemes
+        # if else statement ensures that each word is counted with at least one syllable, even if that word is not
+        # in the pronouncing library's dictionary (using phoneme for 'I' as a placeholder for single syllable)
+        phonemes = [pronouncing.phones_for_word(word)[0] if pronouncing.phones_for_word(word) else 'AY1' \
+                    for word in line.split()]
+        # count the syllables in each string and add the total syllables per line to the total list
+        total.append(sum([pronouncing.syllable_count(phoneme) for phoneme in phonemes]))
+    
+    # return the total number of syllables
+    return sum(total)
 
 # self-defined contractions
 def load_dict_contractions():
