@@ -147,3 +147,6 @@ temp_workbook.ipynb
 /data/poetry_foundation_raw_first_pass.csv
 /data/poetry_foundation_clean.csv
 /data/poetry_foundation_genres_first_features.csv
+
+# neural net models
+*.h5
