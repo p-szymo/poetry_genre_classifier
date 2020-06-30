@@ -10,6 +10,7 @@ from unicodedata import normalize
 import pytesseract
 from ast import literal_eval
 
+# find urls for poets on poetryfoundation.org
 def poet_urls_by_genre(genre_code, max_page_num):
     '''Scraper for PoetryFoundation.org--scrapes urls for poets by genre.
        Input genre code and maximum number of pages to iterate through.
@@ -50,6 +51,7 @@ def poet_urls_by_genre(genre_code, max_page_num):
             
     return poet_urls
 
+# find urls for poems on poetryfoundation.org
 def poem_urls_scraper(poet_url):
     '''Scraper for PoetryFoundation.org--scrapes poem urls by poet.
        Input the url for a poet's page on PoetryFoundation.org.
@@ -83,6 +85,7 @@ def poem_urls_scraper(poet_url):
     
     return poems_text_urls, poems_scan_urls
 
+# scrape poems for text and other info on poetryfoundation.org
 def poem_scraper(poem_url):
     '''Scraper for PoetryFoundation.org--scrapes poet name, poem title, poem year, list of poem's lines,
        and the poem as a string.
@@ -171,6 +174,7 @@ def poem_scraper(poem_url):
     
     return info
 
+# combines scraping of poetry in a loop and creates a dataframe
 def pf_scraper(poet_urls_dict, genre, time_sleep=1):
     '''Scraper for PoetryFoundation.org--scrapes poet name, poem title, poem year, list of poem's lines,
        and the poem as a string.
@@ -208,6 +212,7 @@ def pf_scraper(poet_urls_dict, genre, time_sleep=1):
     return df
 
 # BELOW IS A SERIES OF RESCRAPER FUNCTIONS FOR SPECIFIC CASES THAT SHOULD IDEALLY BE BUILT INTO THE LARGER FUNCTION ABOVE
+# DOCUMENTATION AND COMMENTS ABSENT DUE TO LACK OF TIME
 def poempara_rescraper(poem_url):
     page = rq.get(poem_url)
     soup = bs(page.content, 'html.parser')

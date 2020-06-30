@@ -3,20 +3,6 @@
 ## Approach
 After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems within certain genres, I perform natural language processing (NLP) techniques to analyze the characteristics and word usage of four self-determined poetic movements: pre-1900 (Victorian and Romantic), Modern (a standalone category), Metropolitan (New York School [1st and 2nd Generation], Confessional, Beat, Harlem Renaissance, Black Arts Movement), and Avant-Garde (Imagist, Black Mountain, Language Poetry, Objectivist). Through text processing, feature engineering, and exploratory data analysis, I discover insights into how important words and structure relate to genre. I then create predictive models to provide further insight and confirm my findings during EDA.
 
-### Some questions:
-
-
-
-* How does the sentiment of tweets change over time?
-    * Hypothesis: Tweets will be more negative on average in January and get more positive on average as time goes on.
-* Will Twitter stats (number of likes, replies, retweets) play a role in determining sentiment?
-    * Hypothesis: The most important features will most likely be the words themselves.
-* Does topic modeling provide any insight toward tweet sentiment or the COVID-19 crisis?
-    * Hypothesis: Topic modeling should be a factor in determining sentiment and can give us insights into the pandemic.
-* What insights can be provided by using machine learning?
-    * Hypothesis: The lion's share of the insights will come during EDA.
-* What are the most frequent words? And do they play a role in determining sentiment?
-
 ## Findings and future considerations
 - Pre-1900 poetry is easily recognized
     - High number of end rhymes, most words per line, and simpler words (fewer syllables per word)
@@ -70,29 +56,19 @@ After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems 
     'sweet'
 
 ### 10 best features (SVM): (in order of magnitude)
-    Words per line (average)
-    among
-    black
-    get
-    dream
-    look
-    cry
     crazy
-    leaf
-    sing
+    among
+    nobody
+    form
+    look
+    Words per line (average)
+    dream
+    small
+    cry
+    star
 
 # Final conclusion
-##### 
-
-
-
-
-The overall sentiment of tweets was fairly evenly divided between positive and negative throughout the five months. There were some interesting results from our prediction models, namely that some continuous variables like subjectivity score, number of likes, and number of replies were some of the most important variables for predicting a tweet's sentiment. Other important features were words with high frequencies. Given more time we would try to get better accuracy via a deep learning model, including an LSTM model. And finally, we would like to further investigate sentiment toward the work mask (or masks) in particular as opposed to the overall sentiment of the tweet as a whole.
-
-
-
-
-
+#### Creating and analyzing numerical features of poetic form and structure proved fruitful for most models in terms of classifying which movement a poem belonged to. They did not, however, show to be very helpful for the best model, which used SVM, which instead seemed mostly to use lower frequency words. With more time, I would like to explore training word embeddings and using pre-trained word embeddings with LSTM and CNN neural networks. My next steps include building a recommendation system using these results, as well as generating some poetry based on each movement. To make a truly good recommendation system, however, one would need to be able to build a model around specific genres, rather than an umbrella movement. Still, one may be able to use these umbrella genres and then look at genres within those.
 
 ## List of files
 - **.gitignore** - list of files and pathways to ignore
@@ -158,6 +134,4 @@ The overall sentiment of tweets was fairly evenly divided between positive and n
 - Word Cloud (by genre):
 ![Word Cloud (by genre)](charts/word_cloud_genre.png)
 
-
 ### BLOG POST FORTHCOMING
-

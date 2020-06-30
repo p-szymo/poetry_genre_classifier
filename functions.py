@@ -16,16 +16,17 @@ from textblob import TextBlob as tb
 
 import pronouncing
 
+# convert lists that became strings when saved to csv
 def destringify(x):
     '''Function found on Stack Overflow. Uses AST's literal_eval function to turn a list inside of a string into a list.
        Allows for errors, namely those caused by NaN values.
-       (https://stackoverflow.com/questions/52232742/how-to-use-ast-literal-eval-in-a-pandas-dataframe-and-handle-exceptions)'''
+       https://stackoverflow.com/questions/52232742/how-to-use-ast-literal-eval-in-a-pandas-dataframe-and-handle-exceptions'''
     try:
         return literal_eval(x)
     except (ValueError, SyntaxError) as e:
         return x
     
-
+# list of roman numerals for stop words
 def roman_numerals():
     '''Returns a list of roman numerals, 1-100.'''
     return [
@@ -39,6 +40,7 @@ def roman_numerals():
             'XCII', 'XCIII', 'XCIV', 'XCV', 'XCVI', 'XCVII', 'XCVIII', 'XCIX', 'C'
         ]
 
+# clean up poem formatting
 def line_cleaner(lines):
     '''Input lines of a poem. Function strips poem of white space and removes empty lines.
        Output cleaned up lines.'''
@@ -57,6 +59,7 @@ def line_cleaner(lines):
     
     return lines_clean
 
+# count number of words in a text
 def word_counter(lines):
     '''Input a list of strings; count the words within each string.
        Output the total number of words across all strings.'''
@@ -66,6 +69,7 @@ def word_counter(lines):
     word_count = sum(line_count)
     return word_count
 
+# count number of end rhymes in a text
 def end_rhyme_counter(lines):
     '''Input a list of lines.
        Output the number of end rhymes, i.e. rhymes that happen at the end of the line.'''
@@ -91,12 +95,13 @@ def end_rhyme_counter(lines):
     rhyme_counts = [len(rhyme) for rhyme in rhymes.values()]
     return sum(rhyme_counts)
 
+# count total syllables in text
 def syllable_counter(lines):
     '''Input list of strings, each of which will have its syllables counted.
        Output the total number of syllables in the input list.
        NOTE: does not factor in multi-syllabic digits, times (ex. 1:03), and most likely other non-"word" words.
-       Created around Allison Parrish example in documention for her library, pronouncing.
-       (https://pronouncing.readthedocs.io/en/latest/tutorial.html#counting-syllables)'''
+       Modified Allison Parrish example in documention for her library, pronouncing:
+       https://pronouncing.readthedocs.io/en/latest/tutorial.html#counting-syllables'''
     # create empty list
     total = []
     # loop over list
@@ -112,9 +117,10 @@ def syllable_counter(lines):
     # return the total number of syllables
     return sum(total)
 
-# self-defined contractions
+# contractions conversions
 def load_dict_contractions():
-    '''Dictionary of contractions as keys and their expanded words as values.'''
+    '''Dictionary of contractions as keys and their expanded words as values.
+       Modified from: https://stackoverflow.com/questions/19790188/expanding-english-language-contractions-in-python'''
     
     return {
         "ain't": "is not",
@@ -295,9 +301,8 @@ def get_wordnet_pos(word):
 
 # Apply text cleaning techniques
 def clean_text(text, stop_words):
-    '''Make text lowercase, remove mentions, remove links, convert emoticons/emojis to words, remove punctuation
-    (except apostrophes), tokenize words (including contractions), convert contractions to full words,
-    remove stop words.'''
+    '''Make text lowercase, tokenize words and words with apostrophes, convert contractions to full words,
+    lemmatize by POS tag, remove stop words and words shorter than 3 letters.'''
     
     # make text lowercase
     text = text.lower().replace("’", "'")
@@ -323,6 +328,7 @@ def clean_text(text, stop_words):
     
     return text
 
+# prettier confusion matrix plotter
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion matrix',
