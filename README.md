@@ -21,15 +21,15 @@ After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems 
         - POS tagging
 
 - Some of the words that the SVM model weighed the heaviest were surprising, given that they were mostly not among the top words overall:
-    - among
-    - black
-    - get
-    - dream
-    - look
-    - cry
     - crazy
-    - leaf
-    - sing
+    - among
+    - nobody
+    - form
+    - look
+    - dream
+    - small
+    - cry
+    - star
 
 ## 10 most common words after removing stopwords (# of appearances:
     'love'  (2,996)
@@ -68,7 +68,7 @@ After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems 
     star
 
 # Final conclusion
-#### Creating and analyzing numerical features of poetic form and structure proved fruitful for most models in terms of classifying which movement a poem belonged to. They did not, however, show to be very helpful for the best model, which used SVM, which instead seemed mostly to use lower frequency words. With more time, I would like to explore training word embeddings and using pre-trained word embeddings with LSTM and CNN neural networks. My next steps include building a recommendation system using these results, as well as generating some poetry based on each movement. To make a truly good recommendation system, however, one would need to be able to build a model around specific genres, rather than an umbrella movement. Still, one may be able to use these umbrella genres and then look at genres within those.
+##### Creating and analyzing numerical features of poetic form and structure proved fruitful for most models in terms of classifying which movement a poem belonged to. They were not very helpful, however, for the best model, which used SVM. This model seemed mostly to use lower frequency words. With more time, I would like to explore training word embeddings and using pre-trained word embeddings with LSTM and CNN neural networks. My next steps include building a recommendation system using these results, as well as generating some poetry based on each movement. To make a truly good recommendation system, however, one would need to be able to build a model around specific genres, rather than an umbrella genre. Still, one may be able to use these umbrella genres as a top layer, then move within that to take a closer look at the individual genres it contains.
 
 ## List of files
 - **.gitignore** - list of files and pathways to ignore
