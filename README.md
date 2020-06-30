@@ -4,6 +4,9 @@
 After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems within certain genres, I perform natural language processing (NLP) techniques to analyze the characteristics and word usage of four self-determined poetic movements: pre-1900 (Victorian and Romantic), Modern (a standalone category), Metropolitan (New York School [1st and 2nd Generation], Confessional, Beat, Harlem Renaissance, Black Arts Movement), and Avant-Garde (Imagist, Black Mountain, Language Poetry, Objectivist). Through text processing, feature engineering, and exploratory data analysis, I discover insights into how important words and structure relate to genre. I then create predictive models to provide further insight and confirm my findings during EDA.
 
 ### Some questions:
+
+
+
 * How does the sentiment of tweets change over time?
     * Hypothesis: Tweets will be more negative on average in January and get more positive on average as time goes on.
 * Will Twitter stats (number of likes, replies, retweets) play a role in determining sentiment?
@@ -42,90 +45,118 @@ After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems 
     - leaf
     - sing
 
-## 10 most common words (after removing stopwords):
-    'love'  (2996)
-    'say'   (2528)
-    'day'   (2345)
-    'see'   (2275) 'make': 2260, 'eye': 2091, 'know': 2013, 'night': 1977, 'life': 1975, 'man': 1911
-## Most prevalent features in the Random Forest model: (in order)
-### 10 most common words (after removing stopwords):
-    'need'
-    'spread'
-    'protect'
-    'make'
-    'help'
-    'say'
-    'glove'
-    'public'
-    'hospital'
-    'new'
+## 10 most common words after removing stopwords (# of appearances:
+    'love'  (2,996)
+    'say'   (2,528)
+    'day'   (2,345)
+    'see'   (2,275)
+    'make'  (2,260)
+    'eye'   (2,091)
+    'know'  (2,013)
+    'night' (1,977)
+    'life'  (1,975)
+    'man'   (1,911)
 
-### 10 best features (Decision Tree Classifier):
-    Subjectivity score  (0.0611)
-    Number of likes     (0.0139)
-    'protect'           (0.0132)
-    'help'              (0.0129)
-    'infected'          (0.0115)
-    'safe'              (0.0094)
-    'please'            (0.0083)
-    'death'             (0.0083)
-    'hand'              (0.0076)
-    Number of replies   (0.0072)
+## Most prevalent features in the Random Forest model: (in order of magnitude)
+    End rhymes (total)
+    Words per line (average)
+    Syllables per word (average)
+    Lines (total)
+    Polarity score
+    Subjectivity score
+    'heart'
+    'get'
+    'day'
+    'sweet'
+
+### 10 best features (SVM): (in order of magnitude)
+    Words per line (average)
+    among
+    black
+    get
+    dream
+    look
+    cry
+    crazy
+    leaf
+    sing
 
 # Final conclusion
-##### The overall sentiment of tweets was fairly evenly divided between positive and negative throughout the five months. There were some interesting results from our prediction models, namely that some continuous variables like subjectivity score, number of likes, and number of replies were some of the most important variables for predicting a tweet's sentiment. Other important features were words with high frequencies. Given more time we would try to get better accuracy via a deep learning model, including an LSTM model. And finally, we would like to further investigate sentiment toward the work mask (or masks) in particular as opposed to the overall sentiment of the tweet as a whole.
+##### 
+
+
+
+
+The overall sentiment of tweets was fairly evenly divided between positive and negative throughout the five months. There were some interesting results from our prediction models, namely that some continuous variables like subjectivity score, number of likes, and number of replies were some of the most important variables for predicting a tweet's sentiment. Other important features were words with high frequencies. Given more time we would try to get better accuracy via a deep learning model, including an LSTM model. And finally, we would like to further investigate sentiment toward the work mask (or masks) in particular as opposed to the overall sentiment of the tweet as a whole.
+
+
+
+
+
 
 ## List of files
 - **.gitignore** - list of files and pathways to ignore
-- **data_cleaning_notebook.ipynb** - notebook of compiling our dataframes
-- **eda_visualizations_notebook.ipynb** - notebook with EDA and chart/visualization creations
-- **functions.py** - file with functions used in this project
-- **modeling_notebook.ipynb** - notebook with Naive Bayes and Decision Tree models
-- **nlp_features_notebook.ipynb** - notebook with text processing, LDA topic modeling, and subjectivity scoring
-- **presentation.pdf** - slides for our presentation of this project
+- **01_webscraping_notebook.ipynb** - notebook of scraping, compiling, and cleaning my datasets and corpus
+- **02_eda_processing_feature_engineering.ipynb** - notebook with feature engineering, EDA, text processing, and chart/visualization creations
+- **03_modeling_notebook.ipynb** - notebook with Naive Bayes, Decision Tree, Random Forest, and SVM models
+- **04_word_embeddings_modeling_notebook.ipynb** - notebook with word embeddings (training and pre-trained) and neural networks
+    - NOTE: so far unsuccessful, i.e. worse than Naive Bayes
+- **functions.py** - file with functions used in feature engineering, EDA, modeling, and visualizations for this project
+- **functions_webscraping.py** - file with functions used in webscraping and data cleaning
+- **presentation.pdf** - slides for my presentation of this project
 - **README.md** - this very file!
-- **twitter_scraping_notebook.ipynb** - notebook detailing our scraping of tweets
 - **archives** folder - old jupyter notebooks, mostly scrap
-- **images** folder - charts and visualizations created during the project
-- **models** folder - tweet count vectors and a couple of lda topic models (note: unfortunately not the one in our presentation)
+- **charts** folder - charts and visualizations created during the project
+- **data** folder - datasets, corpora, and models
 
 ## Visualizations
-- Decision Tree Confusion Matrix:
-![Decision Tree Confusion Matrix](Images/dt_conf_matrix.png)
+- Random Forest Confusion Matrix:
+![Random Forest Confusion Matrix](charts/forest_cm.png)
 
-- Tweet Sentiment by LDA Topic:
-![Tweet Sentiment by LDA Topic](Images/lda_sentiment_stacked_bar.png)
+- SVM Confusion Matrix:
+![SVM Confusion Matrix](charts/svm_cm.png)
 
-- LDA Topics:
-![LDA Topics](Images/lda_topics.png)
+- Average Line Length (by genre):
+![Average Line Length](charts/avg_len_line_boxplot.png)
 
-- Sentiment Distribution of Top 20 Tweets per Day:
-![Sentiment Distribution of Top 20 Tweets per Day](Images/sentiment_stacked_line_top20.png)
+- Number of Lines (by genre):
+![Number of Lines](charts/num_lines_boxplot.png)
 
-- Sentiment Distribution Over Time:
-![Sentiment Distribution Over Time](Images/sentiment_stacked_line.png)
+- Average Number of Syllables per Word (by genre):
+![Average Number of Syllables per Word](charts/avg_syllables_word_boxplot.png)
 
-- Top 25 Words by Frequency:
-![Top 25 Words by Frequency](Images/top25_words_bar_twitter-blue.png)
+- Number of End Rhymes (by genre):
+![Number of End Rhymes](charts/num_end_rhymes_boxplot.png)
 
-- Topic Distribution Over Time:
-![Topic Distribution Over Time](Images/topic_distribution_over_time.png)
+- Presence of End Rhymes (by genre):
+![Presence of End Rhymes](charts/end_rhymes_stackedbar.png)
 
-- Number of Negative Tweets by Topic:
-![Number of Negative Tweets by Topic](Images/tweet_count_by_topic_neg.png)
+- Ratio of End Rhymes to Line Count (by genre):
+![Ratio of End Rhymes to Line Count ](charts/end_rhymes_ratio_boxplot.png)
 
-- Number of Neutral Tweets by Topic:
-![Number of Neutral Tweets by Topic](Images/tweet_count_by_topic_neu.png)
+- Polarity Score (by genre):
+![Polarity Score](charts/polarity_boxplot.png)
 
-- Number of Positive Tweets by Topic:
-![Number of Positive Tweets by Topic](Images/tweet_count_by_topic_pos.png)
+- Polarity (by genre):
+![Polarity](charts/polarity_stackedbar.png)
 
-- Word Cloud of Top 100 Words:
-![Word Cloud of Top 100 Words](Images/wordcloud_top100.jpg)
+- Subjectivity Score (by genre):
+![Subjectivity Score](charts/subjectivity_boxplot.png)
 
-- Word Cloud:
-![Word Cloud](Images/wordcloud.jpg)
+- Subjectivity Score (by genre):
+![Subjectivity Score](charts/subjectivity_boxplot.png)
 
+- Top 25 Words by Frequency (overall):
+![Top 25 Words by Frequency (overall)](charts/top25_words_overall_bar.png)
+
+- Top 25 Words by Frequency (by genre):
+![Top 25 Words by Frequency (by genre)](charts/top25_words_genre_bar.png)
+
+- Word Cloud (overall):
+![Word Cloud (overall)](charts/word_cloud_overall.png)
+
+- Word Cloud (by genre):
+![Word Cloud (by genre)](charts/word_cloud_genre.png)
 
 
 ### BLOG POST FORTHCOMING
