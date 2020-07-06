@@ -29,11 +29,11 @@ st.markdown('### I am designed to recommend poetry based on certain parameters.'
 
 # st.button('word')
 
-num_option = st.number_input(
-	'How many shall I compute?',
+num_option = st.sidebar.number_input(
+	'How many poems shall I compute?',
 	min_value=3, max_value=len(df))
 
-initialize_option = st.radio(
+initialize_option = st.sidebar.radio(
 	'What method shall I use to compute?',
 	['word', 'text', 'poem'])
 
