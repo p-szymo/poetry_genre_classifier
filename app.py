@@ -1,10 +1,9 @@
 import streamlit as st
-# To make things easier later, we're also importing numpy and pandas for
-# working with sample data.
 import numpy as np
 import pandas as pd
 import gensim
 from gensim.models import Doc2Vec
+from gensim.utils import simple_preprocess
 
 import pickle
 import gzip
@@ -17,8 +16,9 @@ model = Doc2Vec.load('data/doc2vec.model')
 with gzip.open('data/poetry_rec_system.pkl', 'rb') as hello:
     df = pickle.load(hello)
 
+
 st.title('Greetings! It is I, PO-REC.')
-st.text('Pick an option or two.')
+st.markdown('### I am designed to recommend poetry based on certain parameters.')
 
 # option = st.selectbox(
 #     'Which poet do you like best?',
@@ -27,41 +27,83 @@ st.text('Pick an option or two.')
 # 'Here are available poem titles.'
 # [title for title in df[df.poet == option].title]
 
-poets = ['--']
-poets.extend(df['poet'].unique())
-option_poet = st.sidebar.selectbox(
-    'Pick a poet:',
-     poets)
+# st.button('word')
 
-poet_titles = ['--']
-all_titles = ['--']
-poet_titles.extend(df[df.poet == option_poet].title.unique())
-all_titles.extend(df['title'].unique())
-if option_poet == '--':
-	option_title = st.sidebar.selectbox(
-	    'Pick a poem:',
-	     all_titles)
+num_option = st.number_input(
+	'How many shall I compute?',
+	min_value=3, max_value=len(df))
 
-else:
-	option_title = st.sidebar.selectbox(
-	    'Pick a poem:',
-	     poet_titles)
+initialize_option = st.radio(
+	'What method shall I use to compute?',
+	['word', 'text', 'poem'])
+
+# initialize_option = st.selectbox(
+# 	'How may I compute?',
+# 	['--', 'word', 'text', 'poem title'])
+
+if initialize_option == 'word':
+
+	word_option = st.text_input(
+	'Give me one word.')
+
+	if word_option:
+
+		if word_option.lower() in model.wv.vocab.keys():
+
+			similar_poems = word_similarity(word_option.lower(), df, model,
+											num_poems=num_option)
+
+			filter_process(similar_poems, df)
+
+		else:
+			st.markdown(f'### It may surprise you to learn that I do not know the word,\
+				{word_option}.')
+			st.markdown(f'### Please try another.')
+
+
+elif initialize_option == 'text':
+
+	text_option = st.text_input(
+	'Give me some words.')
+
+	if text_option:
+
+		similar_poems = text_similarity(text_option, df, model, num_poems=num_option)
+		
+		filter_process(similar_poems, df)
+
+
+elif initialize_option == 'poem':
+
+	poets = ['']
+	poets.extend(df['poet'].unique())
+	poet_option = st.selectbox(
+	    'Pick a poet:',
+	     poets)
+
+	poet_titles = ['']
+	poet_titles.extend(df[df.poet == poet_option].title.unique())
+	if poet_option:
+		title_option = st.selectbox(
+		    'Pick a poem:',
+		     poet_titles)
+
+		if title_option:
+
+			
+
+			similar_poems = poem_similarity(title_option,
+											poet_option,
+											df, model,
+											num_poems=num_option)
+
+			filter_process(similar_poems, df)
+
+
 	
-st.text(df.loc[df.title == option_title, 'poem_url'])
+# st.text(df.loc[df.title == option_title, 'poem_url'])
 # 'Here are available poem titles.'
 # [title for title in df[df.poet == option].title]
 
 
-def word_similarity(word, df, model, num_poems=5, to_print=True):
-    # search based on a keyword
-    vec = model[word]
-    similar_poems = model.docvecs.most_similar([vec], topn=num_poems)
-    if to_print:
-        for i, pct in similar_poems:
-            st.markdown(f'### {round(pct*100,1)}% match')
-            st.markdown(f'[{df.loc[i,"title"].upper()}]({df.loc[i,"poem_url"]}) by {df.loc[i,"poet"]}')
-            st.markdown(f'GENRE: {df.loc[i,"genre"].replace("_", " ").title()}')
-            st.markdown('-'*75)
-    return similar_poems   
-
-similar_poems = word_similarity('hell', df, model)
+ 
