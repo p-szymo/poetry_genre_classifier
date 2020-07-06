@@ -1,7 +1,8 @@
+import pandas as pd
 import string
 
 
-def word_similarity(word, model, num_poems=5, to_print=True):
+def word_similarity(word, df, model, num_poems=5, to_print=True):
     # search based on a keyword
     vec = model[word]
     similar_poems = model.docvecs.most_similar([vec], topn=num_poems)
@@ -9,11 +10,12 @@ def word_similarity(word, model, num_poems=5, to_print=True):
         for i, pct in similar_poems:
             print(f'{round(pct*100,1)}% match')
             print(f'{df.loc[i,"title"].upper()} by {df.loc[i,"poet"]}')
+            print(f'GENRE: {df.loc[i,"genre"].replace("_", " ").title()}')
             print(f'URL: {df.loc[i,"poem_url"]}')
             print('-'*100)
     return similar_poems   
               
-def text_similarity(text, model, num_poems=5, to_print=True):
+def text_similarity(text, df, model, num_poems=5, to_print=True):
     # search based on a string
     words = text.translate(str.maketrans('', '', string.punctuation)).translate(str.maketrans('', '', string.digits))\
                      .strip().lower().split()
@@ -23,21 +25,23 @@ def text_similarity(text, model, num_poems=5, to_print=True):
         for i, pct in similar_poems:
             print(f'{round(pct*100,1)}% match')
             print(f'{df.loc[i,"title"].upper()} by {df.loc[i,"poet"]}')
+            print(f'GENRE: {df.loc[i,"genre"].replace("_", " ").title()}')
             print(f'URL: {df.loc[i,"poem_url"]}')
             print('-'*100)
     return similar_poems          
               
-def poem_similarity(title, model, num_poems=5, to_print=True):
-    poem_id = df[df['title'] == 'On Cowee Ridge'].index[0]
+def poem_similarity(title, df, model, num_poems=5, to_print=True):
+    poem_id = df[df['title'] == title].index[0]
     poem = df.loc[poem_id, 'string_titled']
     poem_words = poem.translate(str.maketrans('', '', string.punctuation)).translate(str.maketrans('', '', string.digits))\
                      .strip().lower().split()
-    vector = model.infer_vector(poem_words)
-    similar_poems = model.docvecs.most_similar([vector], topn=num_poems)
+    vector = model.docvecs[poem_id]
+    similar_poems = model.docvecs.most_similar([vector], topn=num_poems+1)[1:]
     if to_print:
         for i, pct in similar_poems:
             print(f'{round(pct*100,1)}% match')
             print(f'{df.loc[i,"title"].upper()} by {df.loc[i,"poet"]}')
+            print(f'GENRE: {df.loc[i,"genre"].replace("_", " ").title()}')
             print(f'URL: {df.loc[i,"poem_url"]}')
             print('-'*100)
     return similar_poems
@@ -80,6 +84,7 @@ def poem_filter(similar_poems, df, genre=None, min_lines=None, max_lines=None, m
         for i, pct in similar_poems:
             print(f'{round(pct*100,1)}% match')
             print(f'{df.loc[i,"title"].upper()} by {df.loc[i,"poet"]}')
+            print(f'GENRE: {df.loc[i,"genre"].replace("_", " ").title()}')
             print(f'URL: {df.loc[i,"poem_url"]}')
             print('-'*100)
     
@@ -87,3 +92,16 @@ def poem_filter(similar_poems, df, genre=None, min_lines=None, max_lines=None, m
         return similar_poems
     else:
         print('Filter too fine. Please retry.')
+                  
+                  
+def make_tsne_subset(tsne_df: pd.DataFrame, poetry_df: pd.DataFrame, column: str, genre: str) -> pd.DataFrame:
+    """
+    Takes a dataframe of a fit/transformed t-SNE object. Beer ID/Doc Tags are the index.
+    Second argument is a string that is the style of beer (as per stated style in the beers dataset)
+    Returns a Pandas Dataframe with t-SNE coordinates of that specific style, allowing you to show clustering
+    """
+    subset = poetry_df.loc[poetry_df[column] == genre]
+    subset_set = set(subset.index)
+    match = set(tsne_df.index).intersection(subset_set)
+    style_subset = tsne_df[tsne_df.index.isin(match)]
+    return style_subset
