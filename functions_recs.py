@@ -110,8 +110,8 @@ def filter_process(similar_poems, df):
         ['no', 'yes'])
 
     if to_filter_option == 'yes':
-        st.sidebar.markdown('### FILTER OPTIONS')
-        
+        st.sidebar.markdown('## FILTER OPTIONS')
+
         genres = ['']
         genres.extend(df['genre'].unique())
         genres = [genre.replace('_', ' ').title() for genre in genres]
@@ -120,12 +120,14 @@ def filter_process(similar_poems, df):
              genres).replace(' ', '_').lower()
 
         num_lines_options = st.sidebar.slider(
-            'Select a range for the number of lines in my recommendations.',
-            0, int(df.num_lines.max()), (0, int(df.num_lines.max())))
+            'Select a range for the number of lines in each recommendation.',
+            int(df.num_lines.min()), int(df.num_lines.max()),
+            (int(df.num_lines.min()), int(df.num_lines.max())))
 
         len_line_options = st.sidebar.slider(
-            "Select a range for the average number of words per line in my recommendations.",
-            0.0, df.avg_len_line.max(), (0.0, df.avg_len_line.max()))
+            "Select a range for the average number of words per line in each recommendation.",
+            df.avg_len_line.min(), df.avg_len_line.max(), 
+            (df.avg_len_line.min(), df.avg_len_line.max()))
         
         polarities = ['']
         polarities.extend(df['sentiment_polarity'].unique())

@@ -18,7 +18,8 @@ with gzip.open('data/poetry_rec_system.pkl', 'rb') as hello:
 
 
 st.title('Greetings! It is I, PO-REC.')
-st.markdown('### I am designed to recommend poetry based on certain parameters.')
+st.header('I am designed to recommend poetry based on certain parameters.')
+st.subheader('You can fiddle with my settings on the left of your screen.')
 
 # option = st.selectbox(
 #     'Which poet do you like best?',
@@ -29,13 +30,19 @@ st.markdown('### I am designed to recommend poetry based on certain parameters.'
 
 # st.button('word')
 
+st.sidebar.markdown('#### How many poems shall I compute?')
 num_option = st.sidebar.number_input(
-	'How many poems shall I compute?',
-	min_value=3, max_value=len(df))
+	'',
+	min_value=1, max_value=len(df), value=100)
 
+st.sidebar.markdown('')
+
+st.sidebar.markdown('#### What method shall I use to compute?')
 initialize_option = st.sidebar.radio(
-	'What method shall I use to compute?',
+	'',
 	['word', 'text', 'poem'])
+
+st.sidebar.markdown('')
 
 # initialize_option = st.selectbox(
 # 	'How may I compute?',
@@ -56,8 +63,8 @@ if initialize_option == 'word':
 			filter_process(similar_poems, df)
 
 		else:
-			st.markdown(f'### It may surprise you to learn that I do not know the word,\
-				{word_option}.')
+			st.markdown(f'### It may surprise you to learn that I do not know the word\
+				***{word_option}***.')
 			st.markdown(f'### Please try another.')
 
 
