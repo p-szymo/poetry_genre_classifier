@@ -91,11 +91,6 @@ After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems 
 - **data** folder - datasets, corpora, and models
 
 ## Important Visualizations
-### Random Forest Confusion Matrix:
-![Random Forest Confusion Matrix](charts/forest_cm.png)
-
-### SVM Confusion Matrix:
-![SVM Confusion Matrix](charts/svm_cm.png)
 
 ### Average Line Length (by genre):
 ![Average Line Length](charts/avg_len_line_boxplot.png)
@@ -126,6 +121,12 @@ After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems 
 
 ### Word Cloud (by genre):
 ![Word Cloud (by genre)](charts/word_cloud_genre.png)
+
+### Random Forest Confusion Matrix:
+![Random Forest Confusion Matrix](charts/forest_cm.png)
+
+### SVM Confusion Matrix:
+![SVM Confusion Matrix](charts/svm_cm.png)
 
 ## [PO-REC](https://evening-cove-11137.herokuapp.com/) - poetry recommendation app
 
