@@ -26,7 +26,12 @@ model = Doc2Vec.load('data/doc2vec.model')
 with gzip.open('data/poetry_rec_system.pkl', 'rb') as hello:
     df = pickle.load(hello)
 
-    
+
+# image of PO-REC
+st.image('data/PO-REC.png', width=300,
+		 # use_column_width=True
+		 ) 
+
 # message from the recommender-bot
 st.title('Greetings! It is I, PO-REC.')
 st.header('I am designed to recommend poetry based on certain parameters.')
