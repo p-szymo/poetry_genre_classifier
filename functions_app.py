@@ -60,13 +60,13 @@ def word_similarity(word, df, model, num_poems=5):
 
 
 # search based on a phrase
-def text_similarity(text, df, model, num_poems=5):
+def phrase_similarity(phrase, df, model, num_poems=5):
                     
     '''Input a text of any length, as well as dataframe, Doc2Vec model, and number of poems to recommend (default is 5).
        Output a list of tuples with document tag and percent match, to be fed into poem_printout function.'''
                     
     # process the input in the same manner of documents in the model
-    words = simple_preprocess(text)
+    words = simple_preprocess(phrase)
                     
     # create a vector for the input text based on the model
     vec = model.infer_vector(words)
@@ -182,7 +182,7 @@ def filter_process(similar_poems, df):
                     
     # a fateful decision, to filter or not to filter
     to_filter_option = st.radio(
-        'Would you like to filter?',
+        'Would you like to use my filter?',
         ['no', 'yes'])
 
     # filter parameters in the sidebar

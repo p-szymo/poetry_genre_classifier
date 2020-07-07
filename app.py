@@ -56,7 +56,7 @@ st.sidebar.markdown('')
 st.sidebar.markdown('#### What method shall I use to compute?')
 initialize_option = st.sidebar.radio(
 	'',
-	['word', 'text', 'poem'])
+	['word', 'phrase', 'poem'])
 
 
 # format blank space
@@ -66,9 +66,15 @@ st.sidebar.markdown('')
 # for word option
 if initialize_option == 'word':
 
+	# format blank space
+	st.markdown('')
+	st.markdown('')
+
+	# format larger label
+	st.markdown('#### Give me a word.')
 	# ask user for a word
 	word_option = st.text_input(
-	'Give me one word.')
+	'')
 
 	# upon user input
 	if word_option:
@@ -91,17 +97,23 @@ if initialize_option == 'word':
 
 
 # for text option
-elif initialize_option == 'text':
+elif initialize_option == 'phrase':
 
+	# format blank space
+	st.markdown('')
+	st.markdown('')
+
+	# format larger label
+	st.markdown('#### Give me a phrase, or a bunch of words.')
 	# ask user for words
-	text_option = st.text_input(
-	'Give me some words.')
+	phrase_option = st.text_input(
+	'')
 
 	# upon user input
-	if text_option:
+	if phrase_option:
 
 		# run function
-		similar_poems = text_similarity(text_option, df, model, num_poems=num_option)
+		similar_poems = phrase_similarity(phrase_option, df, model, num_poems=num_option)
 		
 		# filter
 		filter_process(similar_poems, df)
@@ -110,13 +122,20 @@ elif initialize_option == 'text':
 # for poem option
 elif initialize_option == 'poem':
 
+	# format blank space
+	st.markdown('')
+	st.markdown('')
+
 	# initialize blank list
 	poets = ['']
 	# add all poets from dataframe
 	poets.extend(df['poet'].unique())
+
+	# format larger label
+	st.markdown('#### Pick a poet:')
 	# prompt user to select poet
 	poet_option = st.selectbox(
-	    'Pick a poet:',
+	    '',
 	     poets)
 
 	# initialize blank list
@@ -125,8 +144,12 @@ elif initialize_option == 'poem':
 	poet_titles.extend(df[df.poet == poet_option].title.unique())
 	# prompt user to select title (only after poet is selected)
 	if poet_option:
+		# format blank space
+		st.markdown('')
+		# format larger label
+		st.markdown('#### Pick a poem:')
 		title_option = st.selectbox(
-		    'Pick a poem:',
+		    '',
 		     poet_titles)
 
 		# upon title selection
