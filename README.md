@@ -75,12 +75,17 @@ After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems 
 - **01_webscraping_notebook.ipynb** - notebook of scraping, compiling, and cleaning my datasets and corpus
 - **02_eda_processing_feature_engineering.ipynb** - notebook with feature engineering, EDA, text processing, and chart/visualization creations
 - **03_modeling_notebook.ipynb** - notebook with Naive Bayes, Decision Tree, Random Forest, and SVM models
-- **04_word_embeddings_modeling_notebook.ipynb** - notebook with word embeddings (training and pre-trained) and neural networks
-    - NOTE: so far unsuccessful, i.e. worse than Naive Bayes
+- **04_recommendation_system.ipynb** - notebook with Doc2Vec model training and function building
+- **app.py** - file with app layout
 - **functions.py** - file with functions used in feature engineering, EDA, modeling, and visualizations for this project
+- **functions_app.py** - file with functions in app
+- **functions_rec_tests.py** - file used for building functions for testing in jupyter notebook
 - **functions_webscraping.py** - file with functions used in webscraping and data cleaning
 - **presentation.pdf** - slides for my presentation of this project
 - **README.md** - this very file!
+- **Procfile** - requirement for Heroku deploy
+- **requirements.txt** - requirement for Heroku deploy
+- **setup.sh** - requirement for Heroku deploy
 - **archives** folder - old jupyter notebooks, mostly scrap
 - **charts** folder - charts and visualizations created during the project
 - **data** folder - datasets, corpora, and models
@@ -133,5 +138,7 @@ After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems 
 
 - Word Cloud (by genre):
 ![Word Cloud (by genre)](charts/word_cloud_genre.png)
+
+## [PO-REC](https://evening-cove-11137.herokuapp.com/) poetry recommendation app
 
 ### BLOG POST FORTHCOMING
