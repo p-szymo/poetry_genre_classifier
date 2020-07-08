@@ -129,5 +129,6 @@ Creating and analyzing numerical features of poetic form and structure proved fr
 ![SVM Confusion Matrix](charts/svm_cm.png)
 
 # [PO-REC](https://evening-cove-11137.herokuapp.com/) - poetry recommendation app
+![PO-REC](data/PO-REC.png)
 
 ## BLOG POST FORTHCOMING
