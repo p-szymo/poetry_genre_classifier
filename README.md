@@ -81,6 +81,7 @@ Creating and analyzing numerical features of poetic form and structure proved fr
 - **functions_rec_tests.py** - file used for building functions for testing in jupyter notebook
 - **functions_webscraping.py** - file with functions used in webscraping and data cleaning
 - **presentation.pdf** - slides for my presentation of this project
+- **presentation_including_app.pdf** - updated slides for my presentation of this project including an app demo
 - **README.md** - this very file!
 - **Procfile** - requirement for Heroku deploy
 - **requirements.txt** - requirement for Heroku deploy
