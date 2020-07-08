@@ -1,7 +1,6 @@
 # Predicting Poetic Movements
 
-## Approach
-After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems within certain genres, I perform natural language processing (NLP) techniques to analyze the characteristics and word usage of four self-determined poetic movements: pre-1900 (Victorian and Romantic), Modern (a standalone category), Metropolitan (New York School [1st and 2nd Generation], Confessional, Beat, Harlem Renaissance, Black Arts Movement), and Avant-Garde (Imagist, Black Mountain, Language Poetry, Objectivist). Through text processing, feature engineering, and exploratory data analysis, I discover insights into how important words and structure relate to genre. I then create predictive models to provide further insight and confirm my findings during EDA.
+After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems within certain genres, I perform natural language processing (NLP) techniques to analyze the characteristics and word usage of four self-determined poetic movements: pre-1900 (Victorian and Romantic), Modern (a standalone category), Metropolitan (New York School [1st and 2nd Generation], Confessional, Beat, Harlem Renaissance, Black Arts Movement), and Avant-Garde (Imagist, Black Mountain, Language Poetry, Objectivist). Through text processing, feature engineering, and exploratory data analysis, I discover insights into how important words and structure relate to genre. I then create predictive models to provide further insight and confirm my findings during EDA. Finally, using Gensim's Doc2Vec, I created a [poetry recommendation system](https://evening-cove-11137.herokuapp.com/), which includes a lot of my engineered features in an optional filter.
 
 ## Findings and future considerations
 - Pre-1900 poetry is easily recognized.
@@ -55,7 +54,7 @@ After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems 
     'day'
     'sweet'
 
-### 10 best features (SVM): (in order of magnitude)
+## 10 most important features in the SVM model: (in order of magnitude)
     crazy
     among
     nobody
@@ -67,8 +66,8 @@ After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems 
     cry
     star
 
-# Final conclusion
-###### Creating and analyzing numerical features of poetic form and structure proved fruitful for most models in terms of classifying which movement a poem belonged to. They were not very helpful, however, for the best model, which used SVM. This model seemed mostly to use lower frequency words. With more time, I would like to explore training word embeddings and using pre-trained word embeddings with LSTM and CNN neural networks. My next steps include building a recommendation system using these results, as well as generating some poetry based on each movement. To make a truly good recommendation system, however, one would need to be able to build a model around specific genres, rather than an umbrella genre. Still, one may be able to use these umbrella genres as a top layer, then move within that to take a closer look at the individual genres it contains.
+# Conclusion
+Creating and analyzing numerical features of poetic form and structure proved fruitful for most models in terms of classifying which movement a poem belonged to. They were not very helpful, however, for the best model, which used SVM. This model seemed mostly to use lower frequency words. With more time, I would like to explore training word embeddings and using pre-trained word embeddings with LSTM and CNN neural networks. My next steps include building a recommendation system using these results, as well as generating some poetry based on each movement. To make a truly good recommendation system, however, one would need to be able to build a model around specific genres, rather than an umbrella genre. Still, one may be able to use these umbrella genres as a top layer, then move within that to take a closer look at the individual genres it contains.
 
 ## List of files
 - **.gitignore** - list of files and pathways to ignore
@@ -128,6 +127,6 @@ After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems 
 ### SVM Confusion Matrix:
 ![SVM Confusion Matrix](charts/svm_cm.png)
 
-## [PO-REC](https://evening-cove-11137.herokuapp.com/) - poetry recommendation app
+# [PO-REC](https://evening-cove-11137.herokuapp.com/) - poetry recommendation app
 
 ## BLOG POST FORTHCOMING
