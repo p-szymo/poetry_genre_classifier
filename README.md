@@ -2,6 +2,9 @@
 
 After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems within certain genres, I perform natural language processing (NLP) techniques to analyze the characteristics and word usage of four self-determined poetic movements: pre-1900 (Victorian and Romantic), Modern (a standalone category), Metropolitan (New York School [1st and 2nd Generation], Confessional, Beat, Harlem Renaissance, Black Arts Movement), and Avant-Garde (Imagist, Black Mountain, Language Poetry, Objectivist). Through text processing, feature engineering, and exploratory data analysis, I discover insights into how important words and structure relate to genre. I then create predictive models to provide further insight and confirm my findings during EDA. Finally, using Gensim's Doc2Vec, I created a [poetry recommendation system](https://evening-cove-11137.herokuapp.com/), which includes a lot of my engineered features in an optional filter.
 
+## To use the app locally, run:
+```streamlit run app.py```
+
 ## Findings and future considerations
 - Pre-1900 poetry is easily recognized.
     - High number of end rhymes, most words per line, and simpler words (fewer syllables per word).
@@ -74,6 +77,8 @@ Creating and analyzing numerical features of poetic form and structure proved fr
 - **01_webscraping_notebook.ipynb** - notebook of scraping, compiling, and cleaning my datasets and corpus
 - **02_eda_processing_feature_engineering.ipynb** - notebook with feature engineering, EDA, text processing, and chart/visualization creations
 - **03_modeling_notebook.ipynb** - notebook with Naive Bayes, Decision Tree, Random Forest, and SVM models
+- **03_modeling_notebook-ALL-GENRES.ipynb** - *WORK-IN-PROGRESS!* experimenting with using all genres
+- **03_modeling_notebook-ALL-GENRES-downsampling.ipynb** - *WORK-IN-PROGRESS!* experimenting with using all genres plus downsampling
 - **04_recommendation_system.ipynb** - notebook with Doc2Vec model training and function building
 - **app.py** - file with app layout
 - **functions.py** - file with functions used in feature engineering, EDA, modeling, and visualizations for this project
