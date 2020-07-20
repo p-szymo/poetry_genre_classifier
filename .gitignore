@@ -138,6 +138,8 @@ dmypy.json
 # notebooks
 temp_workbook.ipynb
 02_eda_processing_feature_engineering_notebook-UMBRELLA_GENRES-Copy1.ipynb
+03_modeling_notebook-ALL-GENRES-downsampling-Copy2.ipynb
+03_modeling_notebook-ALL-GENRES-downsampling-Copy3.ipynb
 04_recommendation_system-Copy1.ipynb
 
 # folders
