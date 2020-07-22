@@ -77,8 +77,8 @@ Creating and analyzing numerical features of poetic form and structure proved fr
 - **01_webscraping_notebook.ipynb** - notebook of scraping, compiling, and cleaning my datasets and corpus
 - **02_eda_processing_feature_engineering.ipynb** - notebook with feature engineering, EDA, text processing, and chart/visualization creations
 - **03_modeling_notebook.ipynb** - notebook with Naive Bayes, Decision Tree, Random Forest, and SVM models
-- **03_modeling_notebook-ALL-GENRES.ipynb** - *WORK-IN-PROGRESS!* experimenting with using all genres
-- **03_modeling_notebook-ALL-GENRES-downsampling.ipynb** - *WORK-IN-PROGRESS!* experimenting with using all genres plus downsampling
+<!-- - **03_modeling_notebook-ALL-GENRES.ipynb** - *WORK-IN-PROGRESS!* experimenting with using all genres
+- **03_modeling_notebook-ALL-GENRES-downsampling.ipynb** - *WORK-IN-PROGRESS!* experimenting with using all genres plus downsampling -->
 - **04_recommendation_system.ipynb** - notebook with Doc2Vec model training and function building
 - **app.py** - file with app layout
 - **functions.py** - file with functions used in feature engineering, EDA, modeling, and visualizations for this project
