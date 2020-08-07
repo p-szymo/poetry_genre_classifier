@@ -137,7 +137,10 @@ dmypy.json
 
 # notebooks
 temp_workbook.ipynb
+01_webscraping_notebook-Copy1.ipynb
+01_webscraping_notebook-Copy2.ipynb
 02_eda_processing_feature_engineering_notebook-UMBRELLA_GENRES-Copy1.ipynb
+03_modeling_notebook-Copy1.ipynb
 03_modeling_notebook-ALL-GENRES-downsampling-Copy2.ipynb
 03_modeling_notebook-ALL-GENRES-downsampling-Copy3.ipynb
 03_modeling_notebook-ALL-GENRES.ipynb
@@ -151,16 +154,7 @@ temp_workbook.ipynb
 /poem_imgs/*
 
 # Datasets
-/data/poetry_foundation_raw_first_pass.csv
-/data/poetry_foundation_raw.csv
-/data/poetry_foundation_clean.csv
-/data/poetry_foundation_genres_first_features.csv
-/data/target_genres.pkl
-/data/features.pkl
-/data/poetry_genres_df.pkl
-/data/tokens.pkl
-/data/poetry_all_genres_df.pkl
-/data/poetry_umbrella_genres_df.pkl
+/data
 
 # neural net models
 *.h5
