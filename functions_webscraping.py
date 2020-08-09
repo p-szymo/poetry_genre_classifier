@@ -272,30 +272,48 @@ def text_poem_scraper(poem_url):
     return info
 
 
-def process_image(poem_url, first=True):
+
+def process_image(poem_url, first=True, poet=None, title=None):
     page = rq.get(poem_url)
     soup = bs(page.content, 'html.parser')
     if first:
-        poet = soup.find('a', href=re.compile('.*/poets/.*')).contents[0]
-        jumble_pattern = r'-[0-9]+[a-z][0-9a-z]*$'
-        clean_url = re.sub(jumble_pattern, '', poem_url)
-        title_pattern = r'[a-z0-9\-]*$'
-        title = re.search(
-            title_pattern,
-            clean_url,
-            re.I).group().replace(
-            '-',
-            ' ').title()
+        if not poet:
+            poet = soup.find('a', href=re.compile('.*/poets/.*')).contents[0]
+        if not title:
+            jumble_pattern = r'-[0-9]+[a-z][0-9a-z]*$'
+            clean_url = re.sub(jumble_pattern, '', poem_url)
+            title_pattern = r'[a-z0-9\-]*$'
+            title = re.search(
+                title_pattern,
+                clean_url,
+                re.I).group().replace(
+                '-',
+                ' ').title()
     img_link = soup.find('img', src=re.compile('.*/jstor/.*'))['src']
     img_data = rq.get(img_link).content
     with open('data/temp.png', 'wb') as handle:
         handle.write(img_data)
     text = pytesseract.image_to_string('data/temp.png')
     if first:
-        scan_pattern = fr'{title.split()[-1].upper()}\b.*((\r?\n(?![A-Z][A-Z ]{3,}$).*)*)'
+        try:
+            scan_pattern = fr'{title.split()[-1].upper()}\b.*((\r?\n(?![A-Z][A-Z ]{3,}$).*)*)'
+            lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
+        except:
+            try:
+                scan_pattern = fr'{title.split()[-1].title()}\b.*((\r?\n(?![A-Z][A-Z ]{3,}$).*)*)'
+                lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
+            except:
+                try:
+                    scan_pattern = fr'{title.split()[-1].lower()}\b.*((\r?\n(?![A-Z][A-Z ]{3,}$).*)*)'
+                    lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
+                except:
+                    scan_pattern = fr'{title.split()[0].upper()}\b.*((\r?\n(?![A-Z][A-Z ]{3,}$).*)*)'
+                    lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
+            
     else:
         scan_pattern = r'\n((\r?\n(?![A-Z][A-Z ]{3,}$).*)*)'
-    lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
+        lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
+            
     next_page = soup.find(
         'a', attrs={
             'class': 'c-assetStack-media-control c-assetStack-media-control_next'})['href']
@@ -306,9 +324,9 @@ def process_image(poem_url, first=True):
     return lines, next_page
 
 
-def scan_poem_scraper(poem_url):
-    lines, poet, title, next_page = process_image(poem_url)
-    while re.match(r'[\[\(]?[\d]+[\]\)]?', lines[-1]):
+def scan_poem_scraper(poem_url, input_poet=None, input_title=None):
+    lines, poet, title, next_page = process_image(poem_url, poet=input_poet, title=input_title)
+    while re.match(r'[\[\(]?\s?[\d]+\s?[\]\)]?', lines[-1]):
         add_lines, next_page = process_image(next_page, first=False)
         if not add_lines:
             break
@@ -612,9 +630,11 @@ def poempara_rescraper(poem_url):
 def PoemView_rescraper(poem_url):
     page = rq.get(poem_url)
     soup = bs(page.content, 'html.parser')
-    lines_raw = soup.find('div', {'data-view': 'PoemView'}).contents
-    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
-    lines = [line.replace('<br/>', '') for line in lines]
+    lines_raw = soup.find(
+                        'div', {
+                            'data-view': 'PoemView'}).get_text().split('\r')
+#     lines_raw = soup.find('div', {'data-view': 'PoemView'}).contents
+    lines = [normalize('NFKD', line).replace('\ufeff', '') for line in lines_raw if line]
     lines = [line.strip() for line in lines if line.strip()]
     line_pattern = '>(.*?)<'
     lines_clean = []
@@ -775,6 +795,20 @@ def p_rescraper_2(poem_url):
             lines_clean.append(line.strip())
     poem_string = '\n'.join(lines_clean)
     return lines_clean, poem_string
+
+def image_rescraper_title(poem_url, title):
+    page = rq.get(poem_url)
+    soup = bs(page.content, 'html.parser')
+    img_link = soup.find('img', src=re.compile('.*/jstor/.*'))['src']
+    img_data = rq.get(img_link).content
+    with open('poem_imgs/temp.png', 'wb') as handle:
+        handle.write(img_data)
+    text = pytesseract.image_to_string('poem_imgs/temp.png')
+    scan_pattern = r'\s*((.*\s.*)*)'
+    lines = re.search(scan_pattern, text, re.I).group(1).splitlines()
+    lines = [line.strip() for line in lines if line]
+    poem_string = '\n'.join(lines)
+    return lines, poem_string
 
 
 def image_rescraper_POETRY(poem_url):
