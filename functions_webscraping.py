@@ -314,19 +314,18 @@ def process_image(poem_url,
                     scan_pattern = fr'{title.split()[-1].lower()}{first_pattern}'
                     lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
                 except:
-                    try:
-                        # most common title format, first word
-                        scan_pattern = fr'{title.split()[0].upper()}{first_pattern}'
-                        lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
-                    except:
-                        try:
-                            # if only first letter capitalized, first word
-                            scan_pattern = fr'{title.split()[0]}{first_pattern}'
-                            lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
-                        except:
-                            # if all lowercase, first word
-                            scan_pattern = fr'{title.split()[0].lower()}{first_pattern}'
-                            lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
+                    # most common title format, first word
+                    scan_pattern = fr'{title.split()[0].upper()}{first_pattern}'
+                    lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
+#                     except:
+#                         try:
+#                             # if only first letter capitalized, first word
+#                             scan_pattern = fr'{title.split()[0]}{first_pattern}'
+#                             lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
+#                         except:
+#                             # if all lowercase, first word
+#                             scan_pattern = fr'{title.split()[0].lower()}{first_pattern}'
+#                             lines = re.search(scan_pattern, text, re.MULTILINE).group(1).splitlines()
             
     else:
         # r'\n((\r?\n(?![A-Z][A-Z ]{3,}$).*)*)'
@@ -355,7 +354,8 @@ def scan_poem_scraper(poem_url,
                                                   first_pattern=first_pattern,
                                                   next_pattern=next_pattern)
     
-    while re.match(r'[\[\(]?\s?[\d]+\s?[\]\)]?', lines[-1]):
+    page_number_pattern = r'[\[\(\{]?\s?[\d]+\s?[\]\)\}]?'
+    while re.match(page_number_pattern, lines[-1]):
         add_lines, next_page = process_image(next_page, first=False, next_pattern=next_pattern)
         if not add_lines:
             break
@@ -363,7 +363,7 @@ def scan_poem_scraper(poem_url,
 
     lines = [
         line for line in lines if line if not re.match(
-            r'[\[\(]?\s?[\d]+\s?[\]\)]?', line)]
+            page_number_pattern, line)]
 
     # create string version of poem
     poem_string = '\n'.join(lines)
