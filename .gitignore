@@ -136,19 +136,16 @@ dmypy.json
 .DS_Store
 
 # notebooks
-temp_workbook.ipynb
 01_webscraping_notebook-Copy1.ipynb
-01_webscraping_notebook-Copy2.ipynb
-02_eda_processing_feature_engineering_notebook-UMBRELLA_GENRES-Copy1.ipynb
-03_modeling_notebook-Copy1.ipynb
-03_modeling_notebook-ALL-GENRES-downsampling-Copy2.ipynb
-03_modeling_notebook-ALL-GENRES-downsampling-Copy3.ipynb
-03_modeling_notebook-ALL-GENRES.ipynb
-03_modeling_notebook-ALL-GENRES-downsampling-LEAKAGE.ipynb
-03_modeling_notebook-ALL-GENRES-downsampling-FIX-ATTEMPTS.ipynb
-03_modeling_notebook-ALL-GENRES-downsampling-FIX-ATTEMPTS-2.ipynb
-04_recommendation_system-Copy1.ipynb
-02_data_cleaning.ipynb
+03_eda_processing_feature_engineering_notebook-UMBRELLA_GENRES-Copy1.ipynb
+04_modeling_notebook-Copy1.ipynb
+04_modeling_notebook-ALL-GENRES-downsampling-Copy2.ipynb
+04_modeling_notebook-ALL-GENRES-downsampling-Copy3.ipynb
+04_modeling_notebook-ALL-GENRES.ipynb
+04_modeling_notebook-ALL-GENRES-downsampling-LEAKAGE.ipynb
+04_modeling_notebook-ALL-GENRES-downsampling-FIX-ATTEMPTS.ipynb
+04_modeling_notebook-ALL-GENRES-downsampling-FIX-ATTEMPTS-2.ipynb
+05_recommendation_system-Copy1.ipynb
 
 # folders
 /poems/*
