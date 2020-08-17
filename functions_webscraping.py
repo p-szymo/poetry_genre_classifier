@@ -498,13 +498,10 @@ def PoemView_rescraper(poem_url):
     
     '''
     Function to scrape PoetryFoundation.org for specific type 
-    text in a poem.
+    of text within a poem's PoemView div object.
     
-    The optional parameters can be used when default patterns
-    fail to scrape poems properly.
-    
-    Returns a dictionary with poet name, poem title, poem as a 
-    list of lines, and the URL of the possible next page.
+    Returns a tuple with poem as a list of lines and poem as a
+    single string.
 
     Input
     -----
@@ -531,6 +528,61 @@ def PoemView_rescraper(poem_url):
     
     # process text
     lines = [normalize('NFKD', line).replace('\ufeff', '') for line in lines_raw if line]
+    lines = [line.strip() for line in lines if line.strip()]
+    line_pattern = '>(.*?)<'
+    lines_clean = []
+    for line in lines:
+        if '<' in line:
+            try:
+                lines_clean.append(
+                    re.search(
+                        line_pattern,
+                        line,
+                        re.I).group(1).strip())
+            except BaseException:
+                continue
+        else:
+            lines_clean.append(line.strip())
+            
+    # create string version of poem
+    poem_string = '\n'.join(lines_clean)
+    
+    return lines_clean, poem_string
+
+
+def justify_rescraper(poem_url):
+    
+    '''
+    Function to scrape PoetryFoundation.org for specific type 
+    of text within a poem's justify-aligned div object.
+    
+    Returns a tuple with poem as a list of lines and poem as a
+    single string.
+
+    Input
+    -----
+    poem_url : str
+        URL to a poem's page.
+        
+    Output
+    ------
+    lines_clean : list (str)
+        List of the lines of the poem, without any empty lines.
+    
+    poem_string : str
+        Poem joined with newline characters.
+    '''
+    
+    # load a page and soupify it
+    page = rq.get(poem_url)
+    soup = bs(page.content, 'html.parser')
+    
+    # scrape text from soup
+    lines_raw = soup.find('div', {'style': 'text-align: justify;'}).contents
+    
+    # process text
+    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
+    lines = [line.replace('<br/>', '') for line in lines]
     lines = [line.strip() for line in lines if line.strip()]
     line_pattern = '>(.*?)<'
     lines_clean = []
