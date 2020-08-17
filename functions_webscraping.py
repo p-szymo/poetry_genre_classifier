@@ -492,13 +492,11 @@ def scan_poem_scraper(poem_url,
     return info
 
 
-
-
-def PoemView_rescraper(poem_url):
+def rescraper(poem_url, mode):
     
     '''
     Function to scrape PoetryFoundation.org for specific type 
-    of text within a page's PoemView div object.
+    of text within a page's HTML objects.
     
     Returns a tuple with poem as a list of lines and poem as a
     single string.
@@ -507,7 +505,11 @@ def PoemView_rescraper(poem_url):
     -----
     poem_url : str
         URL to a poem's page.
-        
+    mode : str
+        The HTML object to be scraped.
+        One of ['PoemView', 'poempara', 'p_all', 'justify', 
+                'center'].
+         
     Output
     ------
     lines_clean : list (str)
@@ -521,67 +523,47 @@ def PoemView_rescraper(poem_url):
     page = rq.get(poem_url)
     soup = bs(page.content, 'html.parser')
     
-    # scrape text from soup
-    lines_raw = soup.find(
-                        'div', {
-                            'data-view': 'PoemView'}).get_text().split('\r')
-    
-    # process text
-    lines = [normalize('NFKD', line).replace('\ufeff', '') for line in lines_raw if line]
-    lines = [line.strip() for line in lines if line.strip()]
-    line_pattern = '>(.*?)<'
-    lines_clean = []
-    for line in lines:
-        if '<' in line:
-            try:
-                lines_clean.append(
-                    re.search(
-                        line_pattern,
-                        line,
-                        re.I).group(1).strip())
-            except BaseException:
-                continue
-        else:
-            lines_clean.append(line.strip())
-            
-    # create string version of poem
-    poem_string = '\n'.join(lines_clean)
-    
-    return lines_clean, poem_string
+    if mode == 'PoemView':
+        # scrape text from soup
+        lines_raw = soup.find(
+                            'div', {
+                                'data-view': 'PoemView'}).get_text().split('\r')
 
-
-def justify_rescraper(poem_url):
-    
-    '''
-    Function to scrape PoetryFoundation.org for specific type 
-    of text within a page's justify-aligned div object.
-    
-    Returns a tuple with poem as a list of lines and poem as a
-    single string.
-
-    Input
-    -----
-    poem_url : str
-        URL to a poem's page.
+        # initial process text
+        lines = [normalize('NFKD', line).replace('\ufeff', '') 
+                 for line in lines_raw if line]
         
-    Output
-    ------
-    lines_clean : list (str)
-        List of the lines of the poem, without any empty lines.
+    elif mode == 'poempara':
+        # scrape text from soup
+        lines_raw = soup.find_all('div', {'class': 'poempara'})
+
+        # initial process text
+        lines = [normalize('NFKD', str(line.contents[-1]))
+                 for line in lines_raw if line.contents]
     
-    poem_string : str
-        Poem joined with newline characters.
-    '''
-    
-    # load a page and soupify it
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    
-    # scrape text from soup
-    lines_raw = soup.find('div', {'style': 'text-align: justify;'}).contents
-    
+    elif mode == 'p_all':
+        # scrape text from soup
+        lines_raw = soup.find_all('p')[:-1]
+        
+        # initial process text
+        lines = [normalize('NFKD', str(line.contents[0]))
+                 for line in lines_raw if line]
+        
+    elif mode == 'justify':
+        # scrape text from soup
+        lines_raw = soup.find('div', {'style': 'text-align: justify;'}).contents
+
+        # initial process text
+        lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
+        
+    elif mode == 'center':
+        # scrape text from soup
+        lines_raw = soup.find_all('div', {'style': 'text-align: center;'})
+        
+        # initial process text
+        lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
+        
     # process text
-    lines = [normalize('NFKD', str(line)) for line in lines_raw if line]
     lines = [line.replace('<br/>', '') for line in lines]
     lines = [line.strip() for line in lines if line.strip()]
     line_pattern = '>(.*?)<'
@@ -603,48 +585,3 @@ def justify_rescraper(poem_url):
     poem_string = '\n'.join(lines_clean)
     
     return lines_clean, poem_string
-
-
-def poempara_rescraper(poem_url):
-    
-    '''
-    Function to scrape PoetryFoundation.org for specific type 
-    of text within a page's poempara div objects.
-    
-    Returns a tuple with poem as a list of lines and poem as a
-    single string.
-
-    Input
-    -----
-    poem_url : str
-        URL to a poem's page.
-        
-    Output
-    ------
-    lines : list (str)
-        List of the lines of the poem, without any empty lines.
-    
-    poem_string : str
-        Poem joined with newline characters.
-    '''
-    
-    # load a page and soupify it
-    page = rq.get(poem_url)
-    soup = bs(page.content, 'html.parser')
-    
-    # scrape text from soup
-    lines_raw = soup.find_all('div', {'class': 'poempara'})
-    
-    # process text
-    lines = [normalize('NFKD', str(line.contents[-1]))
-             for line in lines_raw if line.contents]
-    lines = [line.replace('<br/>', '') for line in lines]
-    line_pattern = '>(.*?)<'
-    lines = [re.search(line_pattern, line, re.I).group(
-        1) if '<' in line else line for line in lines]
-    lines = [line.strip() for line in lines if line.strip()]
-    
-    # create string version of poem
-    poem_string = '\n'.join(lines)
-    
-    return lines, poem_string
