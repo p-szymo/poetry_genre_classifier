@@ -136,6 +136,7 @@ dmypy.json
 .DS_Store
 
 # temporary notebooks
+01_webscraping-Copy1.ipynb
 01_webscraping_notebook-Copy1.ipynb
 02_data_cleaning-Copy1.ipynb
 03_eda_processing_feature_engineering_notebook-UMBRELLA_GENRES-Copy1.ipynb
