@@ -149,12 +149,15 @@ dmypy.json
 04_modeling_notebook-ALL-GENRES-downsampling-FIX-ATTEMPTS-2.ipynb
 05_recommendation_system-Copy1.ipynb
 
+Untitled.ipynb
+
 # folders
 /poems/*
 /poem_imgs/*
 
 # Datasets
 /data
+textgenrnn_weights.hdf5
 
 # neural net models
 *.h5
