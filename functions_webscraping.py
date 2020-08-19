@@ -8,7 +8,6 @@ import requests as rq
 from bs4 import BeautifulSoup as bs
 from unicodedata import normalize
 import pytesseract
-from ast import literal_eval
 
 
 # codes signifying genres within url
@@ -164,6 +163,7 @@ def poem_urls_scraper(poet_url):
     return list(set(poems_text_urls)), list(set(poems_scan_urls))
 
 
+# scrape poems already in text format
 def text_poem_scraper(poem_url):
 
     '''
@@ -272,12 +272,14 @@ def text_poem_scraper(poem_url):
     return info
 
 
-def process_image(poem_url, 
-                  first=True, 
-                  poet=None, 
-                  title=None, 
-                  first_pattern='.*((?:\r?\n(?![A-HJ-Z][A-HJ-Z ][A-Z ]+$).*)*)',
-                  next_pattern='\n((?:\r?\n(?![A-HJ-Z][A-HJ-Z ][A-Z ]+$).*)*)'):
+# scrape text from poems in image format
+def process_image(
+        poem_url, 
+        first=True, 
+        poet=None, 
+        title=None, 
+        first_pattern='.*((?:\r?\n(?![A-HJ-Z][A-HJ-Z ][A-Z ]+$).*)*)',
+        next_pattern='\n((?:\r?\n(?![A-HJ-Z][A-HJ-Z ][A-Z ]+$).*)*)'):
     
     '''
     Function to scrape PoetryFoundation.org single scanned image
@@ -401,11 +403,13 @@ def process_image(poem_url,
     return lines, next_page
 
 
-def scan_poem_scraper(poem_url, 
-                      input_poet=None, 
-                      input_title=None, 
-                      first_pattern='.*((?:\r?\n(?![A-HJ-Z][A-HJ-Z ][A-Z ]+$).*)*)',
-                      next_pattern='\n((?:\r?\n(?![A-HJ-Z][A-HJ-Z ][A-Z ]+$).*)*)'):
+# scrape text from poems in image format across possible multiple pages
+def scan_poem_scraper(
+        poem_url, 
+        input_poet=None, 
+        input_title=None, 
+        first_pattern='.*((?:\r?\n(?![A-HJ-Z][A-HJ-Z ][A-Z ]+$).*)*)',
+        next_pattern='\n((?:\r?\n(?![A-HJ-Z][A-HJ-Z ][A-Z ]+$).*)*)'):
     
     '''
     Function to scrape PoetryFoundation.org multiple scanned 
@@ -492,6 +496,7 @@ def scan_poem_scraper(poem_url,
     return info
 
 
+# scrape poems in lesser-used text formats
 def rescraper(poem_url, mode):
     
     '''

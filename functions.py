@@ -1,20 +1,28 @@
+# dataframe packages
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import itertools
 
+# visualization package
+import matplotlib.pyplot as plt
+
+# string processing
 import re
 import string
 from ast import literal_eval
 
+# nlp packages
 import nltk
 from nltk import RegexpTokenizer
 from nltk.stem import WordNetLemmatizer 
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet
 from textblob import TextBlob as tb
-
 import pronouncing
+
+# statistical packages
+from scipy.stats import ttest_ind
+
 
 # convert lists that became strings when saved to csv
 def destringify(x):
@@ -28,16 +36,27 @@ def destringify(x):
     
 # list of roman numerals for stop words
 def roman_numerals():
-    '''Returns a list of roman numerals, 1-100.'''
+    
+    '''
+    Returns a list of roman numerals, 1-100.
+    '''
+    
     return [
-            'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI',
-            'XVII', 'XVIII', 'XIX', 'XX', 'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI', 'XXVII', 'XXVIII', 'XXIX',
-            'XXX', 'XXXI', 'XXXII', 'XXXIII', 'XXXIV', 'XXXV', 'XXXVI', 'XXXVII', 'XXXVIII', 'XXXIX', 'XL', 'XLI',
-            'XLII', 'XLIII', 'XLIV', 'XLV', 'XLVI', 'XLVII', 'XLVIII', 'XLIX', 'L', 'LI', 'LII', 'LIII', 'LIV', 'LV',
-            'LVI', 'LVII', 'LVIII', 'LIX', 'LX', 'LXI', 'LXII', 'LXIII', 'LXIV', 'LXV', 'LXVI', 'LXVII', 'LXVIII',
-            'LXIX', 'LXX', 'LXXI', 'LXXII', 'LXXIII', 'LXXIV', 'LXXV', 'LXXVI', 'LXXVII', 'LXXVIII', 'LXXIX', 'LXXX',
-            'LXXXI', 'LXXXII', 'LXXXIII', 'LXXXIV', 'LXXXV', 'LXXXVI', 'LXXXVII', 'LXXXVIII', 'LXXXIX', 'XC', 'XCI',
-            'XCII', 'XCIII', 'XCIV', 'XCV', 'XCVI', 'XCVII', 'XCVIII', 'XCIX', 'C'
+            'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 
+            'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 
+            'XVIII', 'XIX', 'XX', 'XXI', 'XXII', 'XXIII', 'XXIV', 
+            'XXV', 'XXVI', 'XXVII', 'XXVIII', 'XXIX', 'XXX', 'XXXI', 
+            'XXXII', 'XXXIII', 'XXXIV', 'XXXV', 'XXXVI', 'XXXVII', 
+            'XXXVIII', 'XXXIX', 'XL', 'XLI', 'XLII', 'XLIII', 'XLIV', 
+            'XLV', 'XLVI', 'XLVII', 'XLVIII', 'XLIX', 'L', 'LI', 
+            'LII', 'LIII', 'LIV', 'LV', 'LVI', 'LVII', 'LVIII', 
+            'LIX', 'LX', 'LXI', 'LXII', 'LXIII', 'LXIV', 'LXV', 
+            'LXVI', 'LXVII', 'LXVIII', 'LXIX', 'LXX', 'LXXI', 
+            'LXXII', 'LXXIII', 'LXXIV', 'LXXV', 'LXXVI', 'LXXVII', 
+            'LXXVIII', 'LXXIX', 'LXXX', 'LXXXI', 'LXXXII', 'LXXXIII', 
+            'LXXXIV', 'LXXXV', 'LXXXVI', 'LXXXVII', 'LXXXVIII', 
+            'LXXXIX', 'XC', 'XCI', 'XCII', 'XCIII', 'XCIV', 'XCV', 
+            'XCVI', 'XCVII', 'XCVIII', 'XCIX', 'C'
         ]
 
 # clean up poem formatting
@@ -328,16 +347,77 @@ def clean_text(text, stop_words):
     
     return text
 
-# prettier confusion matrix plotter
-def plot_confusion_matrix(cm, classes,
-                          normalize=False,
-                          title='Confusion matrix',
-                          cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    Code modified from work by SeanAbu Wilson.
-    """
+    
+# perform multiple two-way t-tests
+def two_way_tests(series_list):
+    
+    '''
+    Function to run a two-sided t-test on each combination within
+    a list of Pandas Series values.
+    
+    Returns a dictionary with the indices of the tested series as 
+    the keys and the test results as the values.
+    
+    Input
+    -----
+    series_list : list (Pandas Series)
+        A list in which each item is a Pandas Series of a 
+        continuous variable within a subsection of your data.
+        
+        Example Series format : 
+        ```df['*continuous_var'][df['*subsection'] == '*category']```
+    
+    Output
+    ------
+    compare_dict : dict
+        
+    '''
+    compare_dict = {}
+    for i in range(len(series_list)):
+        count = i+1
+        while count < len(series_list):
+            compare_dict.update({(i,count): ttest_ind(series_list[i], series_list[count])})
+            count += 1
+    return compare_dict
+
+
+# confusion matrix plotter
+def plot_confusion_matrix(
+        cm,
+        classes,
+        normalize=False,
+        title='Confusion matrix',
+        cmap=plt.cm.Blues):
+    
+    '''
+    This function prints and plots a model's confusion matrix.
+
+    Input
+    -----
+    cm : sklearn confusion matrix
+        `sklearn.metrics.confusion_matrix(y_true, y_pred)`
+    classes : list (str)
+        Names of target classes.
+
+    Optional input
+    --------------
+    normalize : bool
+        Whether to apply normalization (default=False).
+        Normalization can be applied by setting `normalize=True`.
+    title : str
+        Title of the returned plot.
+    cmap : matplotlib color map
+        For options, visit:
+        `https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html`
+
+    Output
+    ------
+    Prints a stylized confusion matrix.
+
+
+    [Code modified from work by Sean Abu Wilson.]
+    '''
+
     # convert to percentage, if normalize set to True
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
@@ -362,3 +442,118 @@ def plot_confusion_matrix(cm, classes,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.tight_layout()
+
+    
+# naive bayes feature importances printer
+def print_nb_features(model, df, label_names, num_features=10):
+    
+    '''
+    This function prints feature importances for Bernoulli and
+    Multinomial Naive Bayes models, sorted by measure of importance.
+
+    Input
+    -----
+    model : Naive Bayes model
+        `sklearn.naive_bayes.BernoulliNB()`
+        `sklearn.naive_bayes.MultinomialNB()`
+    df : Pandas DataFrame
+        Features used in model.
+
+    Optional input
+    --------------
+    num_features : int
+        The number of features to print (default=10).
+        All feature importances can be shown by setting
+        `num_features=df.shape[1]`.
+
+    Output
+    ------
+    Prints labels and a list of features.
+    '''
+    
+    # loop through each label
+    for i,label in enumerate(label_names):
+        # sorted features per class by importance
+        prob_sorted = model.feature_log_prob_[i, :].argsort()
+
+        # printout class's features
+        print(f'{label.title()} tweets:\n{", ".join(list(np.take(df.columns, prob_sorted[:num_features])))}\n')
+              
+
+# decision tree feature importances plotter
+def plot_tree_features(
+        model,
+        df,
+        num_features=10,
+        to_print=True,
+        to_save=False,
+        file_name=None):
+    
+    '''
+    This function plots feature importances for Decision Tree models
+    and optionally prints a list of tuples with features and their
+    measure of importance.
+
+    Input
+    -----
+    model : Decision Tree model
+        `sklearn.tree.DecisionTreeClassifier()`
+    df : Pandas DataFrame
+        Features used in model.
+
+    Optional input
+    --------------
+    num_features : int
+        The number of features to plot/print (default=10).
+        All feature importances can be shown by setting
+        `num_features=df.shape[1]`.
+    to_print : bool
+        Whether to print list of feature names and their impurity
+        decrease values (default=True).
+        Printing can be turned off by setting `to_print=False`.
+    file_name : str
+        Path and name to save a graph (default=None).
+        If `file_name=None`, the graph will not be saved.
+
+    Output
+    ------
+    Prints a bar graph and optional list of tuples.
+    '''
+
+    features_dict = dict(zip(df.columns, model.feature_importances_))
+    sorted_d = sorted(
+        features_dict.items(),
+        key=lambda x: x[1],
+        reverse=True)[
+        :num_features]
+
+    # top 10 most important features
+    tree_importance = [x[1] for x in sorted_d]
+
+    # prettify the graph
+    plt.figure(figsize=(12, 8))
+    plt.title('Decision Tree Feature Importances', fontsize=25, pad=15)
+    plt.xlabel('')
+    plt.ylabel('Gini Importance', fontsize=22, labelpad=15)
+    plt.ylim(bottom=sorted_d[-1][1]/1.75, top=sorted_d[0][1]*1.05)
+    plt.xticks(rotation=60, fontsize=20)
+    plt.yticks(fontsize=20)
+
+    # plot
+    plt.bar([x[0] for x in sorted_d], tree_importance)
+
+    # prepare to display
+    plt.tight_layout()
+
+    if file_name:
+        # save plot
+        plt.savefig(file_name, bbox_inches='tight', transparent=True)
+
+    # show plot
+    plt.show()
+
+    if to_print:
+        # print a list of feature names and their impurity decrease value in
+        # the decision tree
+        print('\n\n\n')
+        print(sorted_d)
