@@ -26,9 +26,28 @@ from scipy.stats import ttest_ind
 
 # convert lists that became strings when saved to csv
 def destringify(x):
-    '''Function found on Stack Overflow. Uses AST's literal_eval function to turn a list inside of a string into a list.
-       Allows for errors, namely those caused by NaN values.
-       https://stackoverflow.com/questions/52232742/how-to-use-ast-literal-eval-in-a-pandas-dataframe-and-handle-exceptions'''
+    
+    '''
+    Function using AST's `literal_eval` to convert a list inside 
+    of a string into a list.
+    
+    Allows for errors, namely those caused by NaN values.
+    
+    Input
+    -----
+    x : str
+        String with a list inside.
+        
+    Output
+    ------
+    x : list
+        The list rescued from within a string.
+        Returns the input object if an error occurs.
+    
+    [Code found on Stack Overflow]:
+    https://stackoverflow.com/questions/52232742/how-to-use-ast-\
+    literal-eval-in-a-pandas-dataframe-and-handle-exceptions
+    '''
     try:
         return literal_eval(x)
     except (ValueError, SyntaxError) as e:
@@ -38,7 +57,7 @@ def destringify(x):
 def roman_numerals():
     
     '''
-    Returns a list of roman numerals, 1-100.
+    Returns a list of Roman numerals, 1-100.
     '''
     
     return [
@@ -59,12 +78,29 @@ def roman_numerals():
             'XCVI', 'XCVII', 'XCVIII', 'XCIX', 'C'
         ]
 
+
 # clean up poem formatting
 def line_cleaner(lines):
-    '''Input lines of a poem. Function strips poem of white space and removes empty lines.
-       Output cleaned up lines.'''
+    
+    '''
+    Function that removes whitespace, section headers, and empty
+    lines from list of strings.
+    
+    Input
+    -----
+    lines : list (str)
+        List of strings to be cleaned.
+        
+    Output
+    ------
+    lines_clean : list (str)
+        List of strings without whitespace, section headers, or
+        empty strings.
+    '''
+    
     # remove spaces at beginning and end of lines
     lines_clean = [line.strip() for line in lines]
+    
     # create a list of section headers to remove
     section_headers = roman_numerals()
     section_headers += [str(i) for i in range(1,101)]
@@ -72,74 +108,156 @@ def line_cleaner(lines):
     section_headers += [f'[{i}]' for i in range(1,101)]
     section_headers += [f'PART {num}' for num in roman_numerals()]
     section_headers += [f'PART {i}' for i in range(1,101)]
-    lines_clean = [line for line in lines_clean if line not in section_headers]
+    
+    # remove section headers
+    lines_clean = [line for line in lines_clean\
+                   if line not in section_headers]
+    
     # remove any empty strings
     lines_clean = [line for line in lines_clean if line]
     
     return lines_clean
 
+
 # count number of words in a text
 def word_counter(lines):
-    '''Input a list of strings; count the words within each string.
-       Output the total number of words across all strings.'''
+    
+    '''
+    Function to count the number of words in a list of strings.
+    
+    Input
+    -----
+    lines : list (str)
+        List of strings to count.
+    
+    Output
+    ------
+    word_count : int
+        Total number of words across all strings.
+    '''
+    
     # calculate the number of words per line
     line_count = [len(line.split()) for line in lines]
-    # add up the line word counts
+    
+    # add up the word counts of each line
     word_count = sum(line_count)
+    
     return word_count
+
 
 # count number of end rhymes in a text
 def end_rhyme_counter(lines):
-    '''Input a list of lines.
-       Output the number of end rhymes, i.e. rhymes that happen at the end of the line.'''
+    
+    '''
+    Function to count the instances of rhymes that occur among
+    the last words in lines (end rhymes).
+    
+    Input
+    -----
+    lines : list (str)
+        List of strings to compare.
+    
+    Output
+    ------
+    sum(rhyme_counts) : int
+        The number of end rhymes.
+    '''
+    
     # instantiate an empty dictionary
-    rhymes = {}
+    rhyme_dict = {}
+    
     # make a list of words at the end of the line
-    end_words = [line.split()[-1].translate(str.maketrans('', '', string.punctuation)) for line in lines]
-    # for loop to build the dictionary
+    end_words = [line.split()[-1].translate\
+                 (str.maketrans('', '', string.punctuation)) \
+                 for line in lines]
+    
+    # loop to build the dictionary
     for word in end_words:
         for i in range(len(end_words)):
+            
             # check if a word rhymes with another word in the list
             if end_words[i] in pronouncing.rhymes(word):
+                
                 # check if word is already a key in the dictionary
-                if word not in rhymes:
-                    # or if its rhyming word is already a key in the dictionary
-                    if end_words[i] not in rhymes:
-                        # if neither is, create the word as key and it's rhyme as a value (in a list)
-                        rhymes[word] = [end_words[i]]
+                if word not in rhyme_dict:
+                    
+                    # or if its rhyming word is already a key 
+                    # in the dictionary
+                    if end_words[i] not in rhyme_dict:
+                        
+                        # if neither is, create the word as key and 
+                        # it's rhyme as a value (in a list)
+                        rhyme_dict[word] = [end_words[i]]
+                        
                 else:
-                    # if word is already a key, append its rhyme to its value
-                    rhymes[word].append(end_words[i])
+                    # if word is already a key, append its rhyme to 
+                    # its value
+                    rhyme_dict[word].append(end_words[i])
+                    
     # count up the amount of (unique) rhymes per word
-    rhyme_counts = [len(rhyme) for rhyme in rhymes.values()]
+    rhyme_counts = [len(rhyme) for rhyme in rhyme_dict.values()]
+    
     return sum(rhyme_counts)
+
 
 # count total syllables in text
 def syllable_counter(lines):
-    '''Input list of strings, each of which will have its syllables counted.
-       Output the total number of syllables in the input list.
-       NOTE: does not factor in multi-syllabic digits, times (ex. 1:03), and most likely other non-"word" words.
-       Modified Allison Parrish example in documention for her library, pronouncing:
-       https://pronouncing.readthedocs.io/en/latest/tutorial.html#counting-syllables'''
+    
+    '''
+    Function to count all syllables in a list of strings.
+    
+    NOTE: This does not factor in multi-syllabic digits, 
+    times (i.e. 1:03), and most likely other non-"word" words.
+    
+    Input
+    -----
+    lines : list (str)
+        List of strings to count.
+    
+    Output
+    ------
+    sum(total) : int
+        Total number of syllables in the input list.
+       
+    [Modified Allison Parrish example in documention for her 
+     library, pronouncing]:
+    https://pronouncing.readthedocs.io/en/latest/tutorial.html\
+    #counting-syllables
+    '''
     # create empty list
     total = []
+    
     # loop over list
     for line in lines:
+        
         # turn each word into a string of its phonemes
-        # if else statement ensures that each word is counted with at least one syllable, even if that word is not
-        # in the pronouncing library's dictionary (using phoneme for 'I' as a placeholder for single syllable)
-        phonemes = [pronouncing.phones_for_word(word)[0] if pronouncing.phones_for_word(word) else 'AY1' \
-                    for word in line.split()]
-        # count the syllables in each string and add the total syllables per line to the total list
-        total.append(sum([pronouncing.syllable_count(phoneme) for phoneme in phonemes]))
+        # if else statement ensures that each word is counted with 
+        # at least one syllable, even if that word is not in the 
+        # pronouncing library's dictionary (using phoneme for 'I' 
+        # as a placeholder for single syllable)
+        phonemes = [pronouncing.phones_for_word(word)[0] \
+                    if pronouncing.phones_for_word(word) \
+                    else 'AY1' for word in line.split()]
+        # count the syllables in each string and add the total 
+        # syllables per line to the total list
+        total.append(sum([pronouncing.syllable_count(phoneme)\
+                          for phoneme in phonemes]))
     
     # return the total number of syllables
     return sum(total)
 
+
 # contractions conversions
 def load_dict_contractions():
-    '''Dictionary of contractions as keys and their expanded words as values.
-       Modified from: https://stackoverflow.com/questions/19790188/expanding-english-language-contractions-in-python'''
+    
+    '''
+    Dictionary of contractions as keys and their expanded words 
+    as values.
+    
+    [Code modified from]: 
+    https://stackoverflow.com/questions/19790188/expanding-english-\
+    language-contractions-in-python
+    '''
     
     return {
         "ain't": "is not",
@@ -307,9 +425,28 @@ def load_dict_contractions():
         "you've": "you have",
         }
 
+
+# obtain POS tags
+# NEED TO LOOK INTO THIS ONE!!!!!!!
 def get_wordnet_pos(word):
-    '''Map POS tag to first character lemmatize() accepts.
-       Function taken from https://www.machinelearningplus.com/nlp/lemmatization-examples-python/'''
+    
+    '''
+    Function to map part-of-speech tag to first character 
+    lemmatize() accepts.
+    
+    Input
+    -----
+    word : str
+        Word to tag.
+    
+    Output
+    ------
+    tag_dict.get(tag, wordnet.NOUN)
+       
+    [Code taken from]:
+    https://www.machinelearningplus.com/nlp/lemmatization-examples-python/
+    '''
+    
     tag = nltk.pos_tag([word])[0][1][0].upper()
     tag_dict = {"J": wordnet.ADJ,
                 "N": wordnet.NOUN,
@@ -317,6 +454,8 @@ def get_wordnet_pos(word):
                 "R": wordnet.ADV}
 
     return tag_dict.get(tag, wordnet.NOUN)
+
+
 
 # Apply text cleaning techniques
 def clean_text(text, stop_words):
