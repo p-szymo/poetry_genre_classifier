@@ -459,8 +459,27 @@ def get_wordnet_pos(word):
 
 # Apply text cleaning techniques
 def clean_text(text, stop_words):
-    '''Make text lowercase, tokenize words and words with apostrophes, convert contractions to full words,
-    lemmatize by POS tag, remove stop words and words shorter than 3 letters.'''
+    
+    '''
+    Function to make text lowercase, tokenize words and words with 
+    apostrophes, convert contractions to full words, lemmatize by 
+    POS tag, and remove stop words and words shorter than 3 
+    characters.
+    
+    Input
+    -----
+    text : str
+        Text to be cleaned.
+    stop_words : list (str)
+        List of words to remove from the text.
+        
+    Output
+    ------
+    text : str
+        Lowercase, lemmatized text without contractions, stop words,
+        and one- to two-letter words.
+    
+    '''
     
     # make text lowercase
     text = text.lower().replace("’", "'")
@@ -509,14 +528,26 @@ def two_way_tests(series_list):
     Output
     ------
     compare_dict : dict
-        
+        Key : Tuple of indices of compared items from the input
+            list.
+        Value : Ttest_indResult() object with t-statistic and 
+            p-value.
     '''
+    
+    # instantiate empty dictionary
     compare_dict = {}
+    
+    # loop through indices
     for i in range(len(series_list)):
+        # count represents index of compared item
         count = i+1
+        # until it reaches the last item
         while count < len(series_list):
+            # compare each combination
             compare_dict.update({(i,count): ttest_ind(series_list[i], series_list[count])})
             count += 1
+            
+    # return all comparisons
     return compare_dict
 
 
@@ -552,9 +583,6 @@ def plot_confusion_matrix(
     Output
     ------
     Prints a stylized confusion matrix.
-
-
-    [Code modified from work by Sean Abu Wilson.]
     '''
 
     # convert to percentage, if normalize set to True
