@@ -145,6 +145,38 @@ def word_counter(lines):
     return word_count
 
 
+def unique_word_counter(lines):
+    
+    '''
+    Function to count the number of unique words in a list of 
+    strings.
+    
+    Input
+    -----
+    lines : list (str)
+        List of strings to count.
+    
+    Output
+    ------
+    num_unique : int
+        Total number of unique words across all strings.
+    '''
+    
+    # lowercase all words, remove punctuation and en dashes 
+    process_lines = [line.lower().replace('—', ' ').\
+                     translate(str.maketrans('', '', string.punctuation)) \
+                     for line in lines]
+    
+    # list of all words
+    words = [word for line in process_lines \
+             for word in line.split()]
+    
+    # number of unique words
+    num_unique = len(set(words))
+    
+    return num_unique
+
+
 # count number of end rhymes in a text
 def end_rhyme_counter(lines):
     
@@ -219,10 +251,9 @@ def syllable_counter(lines):
     sum(total) : int
         Total number of syllables in the input list.
        
-    [Modified Allison Parrish example in documention for her 
-     library, pronouncing]:
-    https://pronouncing.readthedocs.io/en/latest/tutorial.html\
-    #counting-syllables
+    [Modified from Allison Parrish's example in the documention 
+     for her library, pronouncing]:
+    https://pronouncing.readthedocs.io/en/latest/tutorial.html
     '''
     # create empty list
     total = []
@@ -245,6 +276,26 @@ def syllable_counter(lines):
     
     # return the total number of syllables
     return sum(total)
+
+
+# list of old timey words for stop words
+def old_timers():
+    
+    '''
+    Returns a list older English stop words.
+    
+    
+    [List modified from]: 
+    https://bryanbumgardner.com/elizabethan-stop-words-for-nlp/
+    '''
+    
+    return [
+        'doth', 'dost', 'ere', 'hast', 'hath', 'hence', 'hither', 
+        'nigh', 'oft', 'shall', "should'st", 'thither', 'tither', 
+        'thee', 'thou', 'thine', 'thy', 'tis', 'twas', 'wast', 
+        'whence', 'wherefore', 'whereto', 'withal', "would'st", 
+        'ye', 'yon', 'yonder'
+    ]
 
 
 # contractions conversions
@@ -478,11 +529,11 @@ def clean_text(text, stop_words):
     text : str
         Lowercase, lemmatized text without contractions, stop words,
         and one- to two-letter words.
-    
     '''
     
     # make text lowercase
-    text = text.lower().replace("’", "'")
+    text = text.lower().replace("’", "'").replace('—', ' ').\
+                translate(str.maketrans('', '', string.punctuation))
 
     # initial tokenization to remove non-words
     tokenizer = RegexpTokenizer("([a-z]+(?:'[a-z]+)?)")
@@ -490,17 +541,24 @@ def clean_text(text, stop_words):
 
     # convert contractions
     contractions = load_dict_contractions()
-    words = [contractions[word] if word in contractions else word for word in words]
+    words = [contractions[word] if word in contractions else \
+             word for word in words]
     text = ' '.join(words)
 
-    # remove stop words, lemmatize using POS tags, and remove two-letter words
+    # remove stop words, lemmatize using POS tags,
+    # and remove two-letter words
     lemmatizer = WordNetLemmatizer()
-    words = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in nltk.word_tokenize(text) \
+    words = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) \
+             for word in nltk.word_tokenize(text) \
              if word not in stop_words]
     
     # removing any words that got lemmatized into a stop word
     words = [word for word in words if word not in stop_words]
+    
+    # removing words less than 3 characters
     words = [word for word in words if len(word) > 2]
+    
+    # rejoin into a string
     text = ' '.join(words)
     
     return text
