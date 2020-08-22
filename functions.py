@@ -564,7 +564,8 @@ def clean_text(text, stop_words):
     
     # make text lowercase
     text = text.lower().replace("’", "'").replace('—', ' ').\
-                translate(str.maketrans('', '', string.punctuation))
+                replace('-', ' ').translate(str.maketrans(
+                '', '', string.punctuation))
 
     # initial tokenization to remove non-words
     tokenizer = RegexpTokenizer("([a-z]+(?:'[a-z]+)?)")
