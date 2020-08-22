@@ -1,13 +1,17 @@
+# dataframe packages
 import pandas as pd
 import numpy as np
 
+# webscraping packages
 from selenium import webdriver
-import re
-import time
 import requests as rq
 from bs4 import BeautifulSoup as bs
-from unicodedata import normalize
 import pytesseract
+
+# string processing
+import re
+from ast import literal_eval
+from unicodedata import normalize
 
 
 # codes signifying genres within url
@@ -590,3 +594,33 @@ def rescraper(poem_url, mode):
     poem_string = '\n'.join(lines_clean)
     
     return lines_clean, poem_string
+
+
+# convert lists that became strings when saved to csv
+def destringify(x):
+    
+    '''
+    Function using AST's `literal_eval` to convert a list inside 
+    of a string into a list.
+    
+    Allows for errors, namely those caused by NaN values.
+    
+    Input
+    -----
+    x : str
+        String with a list inside.
+        
+    Output
+    ------
+    x : list
+        The list rescued from within a string.
+        Returns the input object if an error occurs.
+    
+    [Code found on Stack Overflow]:
+    https://stackoverflow.com/questions/52232742/how-to-use-ast-\
+    literal-eval-in-a-pandas-dataframe-and-handle-exceptions
+    '''
+    try:
+        return literal_eval(x)
+    except (ValueError, SyntaxError) as e:
+        return x

@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 # string processing
 import re
 import string
-from ast import literal_eval
 
 # nlp packages
 import nltk
@@ -24,34 +23,6 @@ import pronouncing
 from scipy.stats import ttest_ind
 
 
-# convert lists that became strings when saved to csv
-def destringify(x):
-    
-    '''
-    Function using AST's `literal_eval` to convert a list inside 
-    of a string into a list.
-    
-    Allows for errors, namely those caused by NaN values.
-    
-    Input
-    -----
-    x : str
-        String with a list inside.
-        
-    Output
-    ------
-    x : list
-        The list rescued from within a string.
-        Returns the input object if an error occurs.
-    
-    [Code found on Stack Overflow]:
-    https://stackoverflow.com/questions/52232742/how-to-use-ast-\
-    literal-eval-in-a-pandas-dataframe-and-handle-exceptions
-    '''
-    try:
-        return literal_eval(x)
-    except (ValueError, SyntaxError) as e:
-        return x
     
 # list of roman numerals for stop words
 def roman_numerals():
@@ -80,16 +51,19 @@ def roman_numerals():
 
 
 # clean up poem formatting
-def line_cleaner(lines):
+def line_cleaner(lines, poet):
     
     '''
-    Function that removes whitespace, section headers, and empty
-    lines from list of strings.
+    Function that cleans list of strings by removing whitespace, 
+    section headers, empty lines, and last line if poet's name 
+    and/or a digit is present.
     
     Input
     -----
     lines : list (str)
         List of strings to be cleaned.
+    poet : str
+        Name of poet.
         
     Output
     ------
@@ -116,7 +90,60 @@ def line_cleaner(lines):
     # remove any empty strings
     lines_clean = [line for line in lines_clean if line]
     
+    # remove last line if poet's name present
+    if poet in lines_clean[-1]:
+        lines_clean = lines_clean[:-1]
+        
+    # remove last line if a digit is present
+    # (almost always a page number or year)
+    # unless it's a one line poem
+    if len(lines_clean) > 1:
+        if any(char.isdigit() for char in lines_clean[-1]):
+            lines_clean = lines_clean[:-1]
+    
     return lines_clean
+
+
+# add title to list of lines, with some conditions
+def titler(title, lines):
+    
+    '''
+    Function that combines title with the lines of a poem.
+    NOTE: Drops all instances of "Untitled"
+    
+    Input
+    -----
+    title : str
+        Name of poem.
+    lines : list (str)
+        List of strings to be titled.
+        
+    Output
+    ------
+    lines : list (str)
+        List of strings with title as first string.
+    '''
+    
+    # poems with intentional title
+    if not title.startswith('Untitled'):
+        
+        # if title is different than the first line
+        if title.lower() != lines[0].lower().translate(
+                            str.maketrans('', '', string.punctuation)):
+            
+            # concat
+            lines = [title] + lines
+        
+    # poems with no title, though the title may include the first line
+    else:
+        # remove "Untitled" and any resultant whitespace
+        title = title.replace('Untitled', '').strip()
+        
+        if title:
+            # concat
+            lines = [title] + lines
+
+    return lines
 
 
 # count number of words in a text
@@ -478,7 +505,6 @@ def load_dict_contractions():
 
 
 # obtain POS tags
-# NEED TO LOOK INTO THIS ONE!!!!!!!
 def get_wordnet_pos(word):
     
     '''
@@ -492,23 +518,28 @@ def get_wordnet_pos(word):
     
     Output
     ------
-    tag_dict.get(tag, wordnet.NOUN)
+    tag : wordnet object
+        POS tag in the necessary format for WordNetLemmatizer().
        
     [Code taken from]:
     https://www.machinelearningplus.com/nlp/lemmatization-examples-python/
     '''
     
+    # get primary tag
     tag = nltk.pos_tag([word])[0][1][0].upper()
-    tag_dict = {"J": wordnet.ADJ,
-                "N": wordnet.NOUN,
-                "V": wordnet.VERB,
-                "R": wordnet.ADV}
+    
+    # proper format conversion dictionary
+    tag_dict = {'J': wordnet.ADJ,
+                'N': wordnet.NOUN,
+                'V': wordnet.VERB,
+                'R': wordnet.ADV}
 
+    # tag, if known; use noun if unknown
     return tag_dict.get(tag, wordnet.NOUN)
 
 
 
-# Apply text cleaning techniques
+# apply text cleaning techniques
 def clean_text(text, stop_words):
     
     '''
