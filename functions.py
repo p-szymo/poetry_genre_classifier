@@ -757,7 +757,7 @@ def plot_confusion_matrix(
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 
     # plot
-    plt.figure(figsize=(6,6))
+    plt.figure(figsize=(8,6))
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
@@ -769,7 +769,7 @@ def plot_confusion_matrix(
     fmt = '.2f' if normalize else 'd'
     thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt), fontsize=15,
+        plt.text(j, i, format(cm[i, j], fmt), fontsize=16,
                  horizontalalignment="center", verticalalignment="center",
                  color="white" if cm[i, j] > thresh else "black")
 
@@ -879,7 +879,7 @@ def plot_tree_features(
     plt.xlabel('')
     plt.ylabel('Gini Importance', fontsize=22, labelpad=15)
     plt.ylim(bottom=sorted_d[-1][1]/1.75, top=sorted_d[0][1]*1.05)
-    plt.xticks(rotation=75, fontsize=20)
+    plt.xticks(rotation=80, fontsize=20)
     plt.yticks(fontsize=20)
 
     # plot
@@ -900,3 +900,70 @@ def plot_tree_features(
         # the decision tree
         print('\n\n\n')
         print(sorted_d)
+        
+        
+# random forest feature importances plotter
+def plot_forest_features(
+    model, 
+    X,
+    num_features=10, 
+    to_print=True):
+    
+    '''
+    This function plots feature importances for Random Forest models
+    and optionally prints a list of tuples with features and their 
+    measure of importance.
+
+    Input
+    -----
+    model : Random Forest model
+        `sklearn.ensemble.RandomForestClassifier()`
+    X : Pandas DataFrame
+        Features used in model.
+
+    Optional input
+    --------------
+    num_features : int
+        The number of features to plot/print (default=15).
+        All feature importances can be shown by setting
+        `num_features=X.shape[1]`.
+    to_print : bool
+        Whether to print list of feature names and their impurity
+        decrease values (default=True).
+        Printing can be turned off by setting `to_print=False`.
+
+    Output
+    ------
+    Prints a bar graph and optional list of tuples.
+    '''
+
+    # list of tuples (column index, measure of feature importance)
+    imp_forest = model.feature_importances_
+
+    # sort feature importances in descending order, slicing top number of
+    # features
+    indices_forest = np.argsort(imp_forest)[::-1][:num_features]
+
+    # rearrange feature names so they match the sorted feature importances
+    names_forest = [X.columns[i] for i in indices_forest]
+
+    # create plot, using num_features as a dimensional proxy
+    plt.figure(figsize=(num_features * 1.5, num_features))
+    plt.bar(range(num_features), imp_forest[indices_forest])
+
+    # prettify plot
+    plt.title('Random Forest Feature Importances', fontsize=30, pad=15)
+    plt.ylabel('Average Decrease in Impurity', fontsize=22, labelpad=20)
+    # add feature names as x-axis labels
+    plt.xticks(range(num_features), names_forest, fontsize=20, rotation=90)
+    plt.tick_params(axis="y", labelsize=20)
+
+    # Show plot
+    plt.tight_layout()
+    plt.show()
+
+    if to_print:
+        # print a list of feature names and their impurity decrease value in
+        # the forest
+        print('\n\n\n')
+        print([(i, j) for i, j in zip(names_forest, imp_forest[indices_forest])])
