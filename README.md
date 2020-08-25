@@ -1,5 +1,11 @@
 # Predicting Poetic Movements
 
+### *NOTE (as of 08/25/2020): I'm currently working on improving this project using more accurately scraped poems. I'm also re-organizing the notebooks, so the modeling and recommendation system notebooks are not currently up to the usual standard.*
+
+### *The app is still useable (and highly, shall we say, recommended). Finally, the conclusions are shaping up to be very similar to what is included in this ReadMe (which will also be revamped).*
+
+### Thanks for understanding :) Without further ado:
+
 After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems within certain genres, I perform natural language processing (NLP) techniques to analyze the characteristics and word usage of four self-determined poetic movements: pre-1900 (Victorian and Romantic), Modern (a standalone category), Metropolitan (New York School [1st and 2nd Generation], Confessional, Beat, Harlem Renaissance, Black Arts Movement), and Avant-Garde (Imagist, Black Mountain, Language Poetry, Objectivist). Through text processing, feature engineering, and exploratory data analysis, I discover insights into how important words and structure relate to genre. I then create predictive models to provide further insight and confirm my findings during EDA. Finally, using Gensim's Doc2Vec, I created a [poetry recommendation system](https://evening-cove-11137.herokuapp.com/), which includes a lot of my engineered features in an optional filter.
 
 ## To use the app locally, run:

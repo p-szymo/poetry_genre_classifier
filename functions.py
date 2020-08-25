@@ -50,8 +50,26 @@ def roman_numerals():
         ]
 
 
+# list of possible section headers, to be removed from lines.
+def section_headers():
+    
+    '''
+    Returns a list of possible section headers.
+    '''
+    
+    # create a list of section headers to remove
+    section_headers = roman_numerals()
+    section_headers += [str(i) for i in range(1,101)]
+    section_headers += [f'[{i}]' for i in range(1,101)]
+    section_headers += [f'[{i}]' for i in range(1,101)]
+    section_headers += [f'PART {num}' for num in roman_numerals()]
+    section_headers += [f'PART {i}' for i in range(1,101)]
+    
+    return section_headers
+    
+    
 # clean up poem formatting
-def line_cleaner(lines, poet):
+def line_cleaner(lines, poet=None):
     
     '''
     Function that cleans list of strings by removing whitespace, 
@@ -62,8 +80,11 @@ def line_cleaner(lines, poet):
     -----
     lines : list (str)
         List of strings to be cleaned.
+        
+    Optional input
+    --------------
     poet : str
-        Name of poet.
+        Name of poet (default=None).
         
     Output
     ------
@@ -75,24 +96,17 @@ def line_cleaner(lines, poet):
     # remove spaces at beginning and end of lines
     lines_clean = [line.strip() for line in lines]
     
-    # create a list of section headers to remove
-    section_headers = roman_numerals()
-    section_headers += [str(i) for i in range(1,101)]
-    section_headers += [f'[{i}]' for i in range(1,101)]
-    section_headers += [f'[{i}]' for i in range(1,101)]
-    section_headers += [f'PART {num}' for num in roman_numerals()]
-    section_headers += [f'PART {i}' for i in range(1,101)]
-    
     # remove section headers
     lines_clean = [line for line in lines_clean\
-                   if line not in section_headers]
+                   if line not in section_headers()]
     
     # remove any empty strings
     lines_clean = [line for line in lines_clean if line]
     
-    # remove last line if poet's name present
-    if poet in lines_clean[-1]:
-        lines_clean = lines_clean[:-1]
+    if poet:
+        # remove last line if poet's name present
+        if poet in lines_clean[-1]:
+            lines_clean = lines_clean[:-1]
         
     # remove last line if a digit is present
     # (almost always a page number or year)
@@ -109,7 +123,10 @@ def titler(title, lines):
     
     '''
     Function that combines title with the lines of a poem.
-    NOTE: Drops all instances of "Untitled"
+    
+    NOTE: Drops all instances of "Untitled" appearing within
+          a poem's title, as well as titles that are identical
+          to a poem's first line.
     
     Input
     -----
@@ -121,7 +138,7 @@ def titler(title, lines):
     Output
     ------
     lines : list (str)
-        List of strings with title as first string.
+        List of strings with cleaned title as first string.
     '''
     
     # poems with intentional title
@@ -132,7 +149,7 @@ def titler(title, lines):
                             str.maketrans('', '', string.punctuation)):
             
             # concat
-            lines = [title] + lines
+            lines = line_cleaner([title]) + lines
         
     # poems with no title, though the title may include the first line
     else:
@@ -140,8 +157,12 @@ def titler(title, lines):
         title = title.replace('Untitled', '').strip()
         
         if title:
-            # concat
-            lines = [title] + lines
+            # if Untitled-less title is different than the first line
+            if title.lower() != lines[0].lower().translate(
+                                str.maketrans('', '', string.punctuation)):
+
+                # concat
+                lines = line_cleaner([title]) + lines       
 
     return lines
 
