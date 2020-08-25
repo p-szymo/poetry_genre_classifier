@@ -655,11 +655,67 @@ def two_way_tests(series_list):
         # until it reaches the last item
         while count < len(series_list):
             # compare each combination
-            compare_dict.update({(i,count): ttest_ind(series_list[i], series_list[count])})
+            compare_dict.update({(i,count): ttest_ind(
+                                                series_list[i], 
+                                                series_list[count]
+                                            )
+                                })
             count += 1
             
     # return all comparisons
     return compare_dict
+
+
+# cap/floor outlier values
+def winsorizer(
+    data, 
+    min_percentile=0.05, 
+    max_percentile=0.95):
+    
+    '''
+    Function that uses winsorization method of capping and
+    flooring outlier values on both ends of a distribution.
+    
+    Input
+    -----
+    data : Pandas Series
+        Values to be transformed.
+    
+    Optional input
+    --------------
+    min_percentile : float
+        Percentile with minimum value to floor data 
+        (default=0.05, i.e. 5th percentile).
+    max_percentile : float 
+        Percentile with maximum value to cap data
+        (default=0.95, i.e. 95th percentile).
+    
+    Output
+    ------
+    capped : array
+        NumPy array with capped and floored values.
+        `data = winsorizer(data)` will overwrite input 
+        Series.
+    '''
+    
+    # calculate thresholds
+    min_thresh = data.quantile(min_percentile)
+    max_thresh = data.quantile(max_percentile)
+    
+    # floor outlier values below mean
+    capped = np.where(
+        data < min_thresh, 
+        min_thresh, 
+        data)
+
+    # cap outlier values above mean
+    capped = np.where(
+        capped > max_thresh, 
+        max_thresh, 
+        capped)
+    
+    # transformed values
+    return capped
 
 
 # confusion matrix plotter
@@ -671,7 +727,7 @@ def plot_confusion_matrix(
         cmap=plt.cm.Blues):
     
     '''
-    This function prints and plots a model's confusion matrix.
+    Function that prints and plots a model's confusion matrix.
 
     Input
     -----
@@ -701,6 +757,7 @@ def plot_confusion_matrix(
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 
     # plot
+    plt.figure(figsize=(6,6))
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
@@ -753,9 +810,17 @@ def print_nb_features(model, df, label_names, num_features=10):
     for i,label in enumerate(label_names):
         # sorted features per class by importance
         prob_sorted = model.feature_log_prob_[i, :].argsort()
+        
+        # prettified labels
+        label_pretty = label.replace("_", "-").title()
+        
+        # printable features
+        features = ", ".join(list(np.take(
+            df.columns, 
+            prob_sorted[:num_features])))
 
         # printout class's features
-        print(f'{label.title()} tweets:\n{", ".join(list(np.take(df.columns, prob_sorted[:num_features])))}\n')
+        print(f'{label_pretty} tweets:\n{features}\n')
               
 
 # decision tree feature importances plotter
@@ -814,7 +879,7 @@ def plot_tree_features(
     plt.xlabel('')
     plt.ylabel('Gini Importance', fontsize=22, labelpad=15)
     plt.ylim(bottom=sorted_d[-1][1]/1.75, top=sorted_d[0][1]*1.05)
-    plt.xticks(rotation=60, fontsize=20)
+    plt.xticks(rotation=75, fontsize=20)
     plt.yticks(fontsize=20)
 
     # plot
