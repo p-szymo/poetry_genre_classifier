@@ -874,7 +874,7 @@ def plot_tree_features(
     tree_importance = [x[1] for x in sorted_d]
 
     # prettify the graph
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(12, 10))
     plt.title('Decision Tree Feature Importances', fontsize=25, pad=15)
     plt.xlabel('')
     plt.ylabel('Gini Importance', fontsize=22, labelpad=15)
