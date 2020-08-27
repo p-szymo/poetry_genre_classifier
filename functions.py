@@ -559,7 +559,6 @@ def get_wordnet_pos(word):
     return tag_dict.get(tag, wordnet.NOUN)
 
 
-
 # apply text cleaning techniques
 def clean_text(text, stop_words):
     
@@ -583,10 +582,13 @@ def clean_text(text, stop_words):
         and one- to two-letter words.
     '''
     
-    # make text lowercase
+    # make text lowercase and convert some punctuation
     text = text.lower().replace("’", "'").replace('—', ' ').\
-                replace('-', ' ').translate(str.maketrans(
-                '', '', string.punctuation))
+                replace('-', ' ')
+    
+    # remove punctuation other than apostrophes
+    text = text.translate(str.maketrans(
+        '', '', string.punctuation.replace("'", "")))
 
     # initial tokenization to remove non-words
     tokenizer = RegexpTokenizer("([a-z]+(?:'[a-z]+)?)")
@@ -596,7 +598,10 @@ def clean_text(text, stop_words):
     contractions = load_dict_contractions()
     words = [contractions[word] if word in contractions else \
              word for word in words]
+    
+    # stringify and remove leftover apostrophes
     text = ' '.join(words)
+    text = text.replace("'", "")
 
     # remove stop words, lemmatize using POS tags,
     # and remove two-letter words
@@ -613,6 +618,51 @@ def clean_text(text, stop_words):
     
     # rejoin into a string
     text = ' '.join(words)
+    
+    return text
+
+
+# simpler text cleaning
+def simple_process(text):
+    
+    '''
+    Function similar to `clean_text` function without removing 
+    stop words or words less than three characters. 
+    
+    Makes text lowercase, removes punctuation, and converts 
+    contractions to full words.
+    
+    Input
+    -----
+    text : str
+        Text to be cleaned.
+        
+    Output
+    ------
+    text : str
+        Lowercase text without punctuation or contractions.
+    '''
+    
+    # make text lowercase and convert some punctuation
+    text = text.lower().replace("’", "'").replace('—', ' ').\
+                replace('-', ' ')
+    
+    # remove punctuation other than apostrophes
+    text = text.translate(str.maketrans(
+        '', '', string.punctuation.replace("'", "")))
+
+    # tokenization to remove non-words
+    tokenizer = RegexpTokenizer("([a-z]+(?:'[a-z]+)?)")
+    words = tokenizer.tokenize(text)
+
+    # convert contractions
+    contractions = load_dict_contractions()
+    words = [contractions[word] if word in contractions else \
+             word for word in words]
+    
+    # stringify and remove leftover apostrophes
+    text = ' '.join(words)
+    text = text.replace("'", "")
     
     return text
 
