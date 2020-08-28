@@ -21,6 +21,8 @@ import pronouncing
 
 # statistical packages
 from scipy.stats import ttest_ind
+from sklearn.metrics import accuracy_score, f1_score, classification_report, confusion_matrix
+from sklearn.model_selection import cross_val_score
 
 
     
@@ -768,6 +770,160 @@ def winsorizer(
     return capped
 
 
+def cv_plotter(
+    model, 
+    features, 
+    target, 
+    scoring='f1_weighted', 
+    cv=10, 
+    n_jobs=-1):
+    
+    '''
+    Function to calculate and visualize cross-validation
+    scores. Plots a graph with the title as the mean of 
+    the scores.
+    
+    Uses sklearn's cross_val_score. For documentation,
+    visit: `https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html`
+    
+    Input
+    -----
+    model : sklearn or similar object
+        Unfitted machine learning model.
+    features : Pandas DataFrame
+        Features for each data point.
+    target : Pandas Series
+        Target class for each data point.
+        
+    Optional input
+    --------------
+    scoring : str
+        Metric to be calculated (default='f1_weighted')
+        For list of metrics, visit:
+        `https://scikit-learn.org/stable/modules/model_evaluation.html`
+    cv : int
+        Number of k-folds (default=10).
+    n_jobs : int
+        Number of computer cores to use (default=-1, i.e.
+        all cores).
+        
+    Output
+    ------
+    cv_scores : list (float)
+        List of calculated scores with length equal to
+        input value for cv.
+        
+    Plots a histogram depicting scores.
+    '''
+    
+    # calculate on k-folds
+    cv_scores = cross_val_score(
+        model, features, target, 
+        scoring=scoring, cv=cv, n_jobs=n_jobs)
+    
+    # graph
+    plt.hist(cv_scores)
+    plt.title(f'Average score: {np.mean(cv_scores)}')
+    plt.show()
+    
+    return cv_scores
+
+
+# model predictions and printout
+def predict(
+    model, 
+    X_train, 
+    y_train, 
+    X_test, 
+    y_test, 
+    classes,
+    to_print=True):
+    
+    '''
+    Function that predicts on training and testing data
+    and returns predictions.
+    
+    Optionally prints out accuracy score, F1 score, 
+    classification report, and confusion matrix
+    (defaults to printing).
+    
+    Input
+    -----
+    model : sklearn or similar object
+        Fitted machine learning model.
+    X_train : Pandas DataFrame
+        Train set features.
+    y_train : Pandas Series
+        Train set classes.
+    X_test : Pandas DataFrame
+        Test set features.
+    y_test : Pandas DataFrame
+        Test set classes.
+    classes : list (str)
+        Target classes (in the order in which
+        they appear in DataFrame).
+        
+    Optional input
+    --------------
+    to_print : bool
+        Whether or not to print metrics and reports
+        (default=True).
+        Set `to_print=False` to not print.
+        
+    Output
+    ------
+    train_preds : list (str, int, or float)
+        List of model's predictions for the training
+        set. 
+    test_preds : list (str, int, or float)
+        List of model's predictions for the testing
+        set. 
+    
+    Optional printout (defaults to printing).
+    '''
+    
+    # predict class for the train and test sets
+    train_preds = model.predict(X_train)
+    test_preds = model.predict(X_test)
+
+    # accuracy and f1 scores for train and test sets
+    acc_train = accuracy_score(y_train, train_preds)
+    acc_test = accuracy_score(y_test, test_preds)
+    
+    # binary scores
+    if len(classes) == 2:
+        f1_train = f1_score(y_train, train_preds)
+        f1_test = f1_score(y_test, test_preds)
+    # multiclass scores
+    else:
+        f1_train = f1_score(y_train, train_preds, average='weighted')
+        f1_test = f1_score(y_test, test_preds, average='weighted')
+
+    # print metrics, classification report, and confusion matrix
+    if to_print:
+        print('-----TRAIN-----')
+        print(f'Accuracy: {acc_train}')
+        print(f'F1 score: {f1_train}')
+        print('\n-----TEST-----')
+        print(f'Accuracy: {acc_test}')
+        print(f'F1 score: {f1_test}')
+
+        print('\n' + '-' * 100 + '\n')
+
+        # print out report for test predictions
+        print(classification_report(y_test, 
+                                    test_preds, 
+                                    target_names=classes))
+
+        print('\n' + '-' * 100 + '\n')
+
+        # print out confusion matrix
+        print("CONFUSION MATRIX:\n")
+        print(confusion_matrix(y_test, test_preds))
+    
+    return train_preds, test_preds
+
+
 # confusion matrix plotter
 def plot_confusion_matrix(
         cm,
@@ -869,8 +1025,8 @@ def print_nb_features(model, df, label_names, num_features=10):
             df.columns, 
             prob_sorted[:num_features])))
 
-        # printout class's features
-        print(f'{label_pretty} tweets:\n{features}\n')
+        # printout class features
+        print(f'{label_pretty}:\n{features}\n')
               
 
 # decision tree feature importances plotter
@@ -1017,3 +1173,42 @@ def plot_forest_features(
         # the forest
         print('\n\n\n')
         print([(i, j) for i, j in zip(names_forest, imp_forest[indices_forest])])
+        
+def svm_features(
+    model, 
+    col_names, 
+    num_features=10, 
+    title='Feature Importances'):
+    
+    '''
+    Function to plot most important features in an SVM model.
+    
+    Input
+    -----
+    model : linear SVC model
+        `sklearn.svm.LinearSVC` OR
+        `sklearn.svm.SVC(kernel='linear')`
+    col_names : list (str)
+        List of column names.
+    num_features : int
+        Number of features to include in graph
+        (default=10).
+    title : str
+        Title of returned graph.
+        
+    Output
+    ------
+    Prints a horizontal bar graph.
+    '''
+    
+    # prettify graph
+    plt.figure(figsize=(num_features / 2,
+                        0.8 * num_features))
+    plt.title(title, fontsize=20, pad=15)
+    plt.xlabel('Coefficient (absolute value)', 
+               fontsize=15, labelpad=10)
+
+    # plot top ten features
+    pd.Series(abs(model.coef_[0]), 
+                  index=col_names)\
+                  .nlargest(10).plot(kind='barh');
