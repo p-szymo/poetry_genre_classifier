@@ -25,6 +25,54 @@ Finally, using Gensim's Doc2Vec, I create a [poetry recommendation system](https
 ## Findings
 
 ### 1. Feature engineering
+#### Number of lines
+- Although the median values are all fairly similar (except for Modern poetry), Pre-1900 poems tend to be much longer on average. The average length was 55 lines, whereas the next highest, Metropolitan, was only 38. The distribution of the upper quartiles in the chart below further depicts a movement that's no stranger to a long poem.
+
+- The lower whisker for Pre-1900 also shows that those poems tend to be *at least* a few lines long (the minimum was 4), whereas the other movements have no problems with a one-line poem.
+
+- Modern poetry tends to be the shortest with the lowest average (33) and a median that is 4 lines fewer than the next lowest.
+
+![Number of Lines by Movement](charts/num_lines_boxplot.png)
+<br/><br/>
+
+#### Average line length (words per line)
+- While the existence of prose poetry (poetry written more in paragraph form, as opposed to employing line breaks) in Avant-Garde, Metropolitan, and Modern poetry skews their averages, the median values tell a different story.
+    - Avant-Garde has the fewest words per line by far, with a median value of about 5.1 words, compared to the next lowest, Metropolitan, at about 6.6 words.
+    - Pre-1900 poetry tends to have the longest lines, with a median value of 7.0 words, and also tends to be the most regular, with the smallest range of values. This makes sense given the adherence to established structures such as sonnets.
+    - It is also worth noting that Pre-1900 poetry has the smallest average value, which is again due to there being no examples of prose poetry.
+
+![Average Line Length by Movement](charts/avg_len_line_boxplot.png)
+<br/><br/>
+
+#### Polarity
+- Pre-1900 poetry is overwhelmingly positive, with a median value of .90! Notice the position of the red line compared to the other movements in the chart below.
+- The other three movements are all very similar to each other, and their polarities had no statistically significant differences between them.
+
+![Average Line Length by Movement](charts/avg_len_line_boxplot.png)
+<br/><br/>
+
+- Poetry is rarely neutral and tends to be positive, with each movement have at least 60% of its poems with positive polarity score.
+- 70% of Pre-1900 poems had a positive polarity score.
+- Avant-Garde poetry contains the most neutral poems, but it's still a relatively small share.
+
+![Polarity of Poetic Movements](charts/polarity_stackedbar.png)
+<br/><br/>
+
+#### End rhymes
+- The ratio of end rhymes (words at the end of a line that rhyme with other words at the end of a line) to the total number of lines ended up being one of my model's best features.
+    - Unsurprisingly, there is a lot of separation between Pre-1900 poetry and the other movements.
+- Avant-Garde poetry tends not to have end rhymes, and they are relatively infrequent in Metropolitan poetry.
+- End rhymes are not uncommon in Modern poetry, but they are truly at home in Pre-1900 poetry.
+
+![Ratio of End Rhymes by Movement](charts/ratio_end_rhymes_boxplot.png)
+<br/><br/>
+
+- SOME TEXT HERE
+
+- MAYBE SOME TEXT HERE
+
+![Polarity of Poetic Movements](charts/end_rhymes_stackedbar.png)
+<br/><br/>
 
 ### 2. Language use across movements
 
