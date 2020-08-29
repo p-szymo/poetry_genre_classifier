@@ -154,13 +154,25 @@ dmypy.json
 
 Untitled.ipynb
 
+# images
+/charts/rnn_cm.png
+/charts/svm_ultra_tuned_cm.png
+/charts/svm_ultra_untuned_cm.png
+/charts/svm_word_untuned_cm.png
+
 # folders
 /poems/*
 /poem_imgs/*
 
-# Datasets
-/data
-textgenrnn_weights.hdf5
+# data
+*.csv
+*.txt
+/archives/data/
+/data/temp.png
+/data/poet_url_dict.pkl
+/data/poem_url_dict.pkl
+/data/poems_df_clean_all.pkl
 
 # neural net models
 *.h5
+*.hdf5

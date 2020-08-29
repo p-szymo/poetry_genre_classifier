@@ -90,7 +90,22 @@ Finally, using Gensim's Doc2Vec, I create a [poetry recommendation system](https
 
 ### 2. Language use across movements
 
+![Word Cloud](charts/word_cloud_overall.png)
+<br/><br/>
+
+![Top 25 Words by Frequency and Movement](charts/top25_words_movement_bar.png)
+<br/><br/>
+
 ### 3. Modeling
+
+![Naive Bayes Confusion Matrix](charts/bnb_combo_cm.png)
+<br/><br/>
+![SVM TF-IDF Confusion Matrix](charts/svm_combo_untuned_cm.png)
+<br/><br/>
+![SVM Doc2Vec Tuned Confusion Matrix](charts/svm_doc_tuned_cm.png)
+<br/><br/>
+![SVM Doc2Vec FINAL Confusion Matrix](charts/svm_doc_FINAL_cm.png)
+<br/><br/>
 
 ### 4. Recommendation system
 
