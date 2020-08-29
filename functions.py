@@ -31,6 +31,7 @@ def roman_numerals():
     
     '''
     Returns a list of Roman numerals, 1-100.
+    
     '''
     
     return [
@@ -57,6 +58,7 @@ def section_headers():
     
     '''
     Returns a list of possible section headers.
+    
     '''
     
     # create a list of section headers to remove
@@ -93,6 +95,7 @@ def line_cleaner(lines, poet=None):
     lines_clean : list (str)
         List of strings without whitespace, section headers, or
         empty strings.
+        
     '''
     
     # remove spaces at beginning and end of lines
@@ -141,6 +144,7 @@ def titler(title, lines):
     ------
     lines : list (str)
         List of strings with cleaned title as first string.
+        
     '''
     
     # poems with intentional title
@@ -184,6 +188,7 @@ def word_counter(lines):
     ------
     word_count : int
         Total number of words across all strings.
+        
     '''
     
     # calculate the number of words per line
@@ -210,6 +215,7 @@ def unique_word_counter(lines):
     ------
     num_unique : int
         Total number of unique words across all strings.
+        
     '''
     
     # lowercase all words, remove punctuation and en dashes 
@@ -243,6 +249,7 @@ def end_rhyme_counter(lines):
     ------
     sum(rhyme_counts) : int
         The number of end rhymes.
+        
     '''
     
     # instantiate an empty dictionary
@@ -304,6 +311,7 @@ def syllable_counter(lines):
     [Modified from Allison Parrish's example in the documention 
      for her library, pronouncing]:
     https://pronouncing.readthedocs.io/en/latest/tutorial.html
+    
     '''
     # create empty list
     total = []
@@ -337,6 +345,7 @@ def old_timers():
     
     [List modified from]: 
     https://bryanbumgardner.com/elizabethan-stop-words-for-nlp/
+    
     '''
     
     return [
@@ -358,6 +367,7 @@ def load_dict_contractions():
     [Code modified from]: 
     https://stackoverflow.com/questions/19790188/expanding-english-\
     language-contractions-in-python
+    
     '''
     
     return {
@@ -546,6 +556,7 @@ def get_wordnet_pos(word):
        
     [Code taken from]:
     https://www.machinelearningplus.com/nlp/lemmatization-examples-python/
+    
     '''
     
     # get primary tag
@@ -582,6 +593,7 @@ def clean_text(text, stop_words):
     text : str
         Lowercase, lemmatized text without contractions, stop words,
         and one- to two-letter words.
+        
     '''
     
     # make text lowercase and convert some punctuation
@@ -643,6 +655,7 @@ def simple_process(text):
     ------
     text : str
         Lowercase text without punctuation or contractions.
+        
     '''
     
     # make text lowercase and convert some punctuation
@@ -695,6 +708,7 @@ def two_way_tests(series_list):
             list.
         Value : Ttest_indResult() object with t-statistic and 
             p-value.
+            
     '''
     
     # instantiate empty dictionary
@@ -748,6 +762,7 @@ def winsorizer(
         NumPy array with capped and floored values.
         `data = winsorizer(data)` will overwrite input 
         Series.
+        
     '''
     
     # calculate thresholds
@@ -814,6 +829,7 @@ def cv_plotter(
         input value for cv.
         
     Plots a histogram depicting scores.
+    
     '''
     
     # calculate on k-folds
@@ -880,6 +896,7 @@ def predict(
         set. 
     
     Optional printout (defaults to printing).
+    
     '''
     
     # predict class for the train and test sets
@@ -956,6 +973,7 @@ def plot_confusion_matrix(
     Output
     ------
     Prints a stylized confusion matrix.
+    
     '''
 
     # convert to percentage, if normalize set to True
@@ -1010,6 +1028,7 @@ def print_nb_features(model, df, label_names, num_features=10):
     Output
     ------
     Prints labels and a list of features.
+    
     '''
     
     # loop through each label
@@ -1067,6 +1086,7 @@ def plot_tree_features(
     Output
     ------
     Prints a bar graph and optional list of tuples.
+    
     '''
 
     features_dict = dict(zip(df.columns, model.feature_importances_))
@@ -1141,6 +1161,7 @@ def plot_forest_features(
     Output
     ------
     Prints a bar graph and optional list of tuples.
+    
     '''
 
     # list of tuples (column index, measure of feature importance)
@@ -1174,6 +1195,7 @@ def plot_forest_features(
         print('\n\n\n')
         print([(i, j) for i, j in zip(names_forest, imp_forest[indices_forest])])
         
+        
 def svm_features(
     model, 
     col_names, 
@@ -1199,16 +1221,17 @@ def svm_features(
     Output
     ------
     Prints a horizontal bar graph.
+    
     '''
     
     # prettify graph
-    plt.figure(figsize=(num_features / 2,
-                        0.8 * num_features))
-    plt.title(title, fontsize=20, pad=15)
+    plt.figure(figsize=(num_features/2,
+                        0.8*num_features))
+    plt.title(title, fontsize=2*num_features, pad=1.5*num_features)
     plt.xlabel('Coefficient (absolute value)', 
-               fontsize=15, labelpad=10)
+               fontsize=1.5*num_features, labelpad=num_features)
 
     # plot top ten features
     pd.Series(abs(model.coef_[0]), 
                   index=col_names)\
-                  .nlargest(10).plot(kind='barh');
+                  .nlargest(num_features).plot(kind='barh');
