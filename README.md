@@ -48,7 +48,7 @@ Finally, using Gensim's Doc2Vec, I create a [poetry recommendation system](https
 - Pre-1900 poetry is overwhelmingly positive, with a median value of .90! Notice the position of the red line compared to the other movements in the chart below.
 - The other three movements are all very similar to each other, and their polarities have no statistically significant differences between them.
 
-![Average Line Length by Movement](charts/avg_len_line_boxplot.png)
+![Average Line Length by Movement](charts/polarity_score_boxplot.png)
 <br/><br/>
 
 - Poetry is rarely neutral and tends to be positive; at least 60% of the poems in each movement have a positive polarity score.
