@@ -93,8 +93,23 @@ Finally, using Gensim's Doc2Vec, I create a [poetry recommendation system](https
 ![Word Cloud](charts/word_cloud_overall.png)
 <br/><br/>
 
+- A lot of **visual** (*see*, *eye*, *light*, *look*, *white*, *face*), **temporal** (*day*, *night*, *time*, *old*, *long*, *never*), and **conceptual** (*love*, *life*, *man*, *heart*, *thing*, *still*, *world*) terms.
+
+- After lemmatization, *come* just barely edged out love for the top spot. This perhaps simultaneously points to a call to action (a beckoning, a la "Come here!"), a passive observation ("He comes from a distant city…", from Diane di Prima's An Exercise in Love), as well as the sexual verb, which is undoubtedly more common in the post-19th Century movements.
+
 ![Top 25 Words by Frequency and Movement](charts/top25_words_movement_bar.png)
 <br/><br/>
+
+- Metropolitan, Modern, and Avant-Garde poetries tend to focus more on the visual and temporal, with Avant-Garde also including some more specifically natural words like *water*, *tree*, *sea*, and *leaf*. 
+
+- It is also worth noting that *love* is only the eighth most popular term for Avant-Garde, whereas it's in the top three of the other movements.
+
+- Pre-1900 poetry skews more conceptual and **ethereal**, with words like *soul* and *god*, which are unique to this movement's top 25.
+    - I'm also surprised at the relative lack of natural terms (with the exception of *sea*), considering this movement includes the Romantic genre, which is known for glorifying nature.
+
+- *Black* is unique to Metropolitan's list, which can presumably be explained by the Harlem Renaissance and Black Arts Movement genres, as well as the dark, gritty aesthetic of city-based poetry by Beat and New York School poets.
+
+- Finally, it is worth noting the scale of each of these graphs, which reflects the wordiness and repetition of Pre-1900 poetry and the opposite qualities in Avant-Garde poetry. As has generally been the case in my analyses, Metropolitan and Modern poetries lie somewhere in the middle.
 
 ### 3. Modeling
 
@@ -158,7 +173,7 @@ I also tried an XGBoost model, which achieved a similar F1 score using the Doc2V
 <!-- - **03_modeling_notebook-ALL-GENRES.ipynb** - *WORK-IN-PROGRESS!* experimenting with using all genres
 - **03_modeling_notebook-ALL-GENRES-downsampling.ipynb** - *WORK-IN-PROGRESS!* experimenting with using all genres plus downsampling -->
 
-## Check out my [blog post]() FORTHCOMING
+## Check out my [blog post](https://medium.com/@joshua.szymanowski/predicting-poetic-movements-51006847cc6f)
 
 # [PO-REC](https://evening-cove-11137.herokuapp.com/) - poetry recommendation app
 ![PO-REC](data/PO-REC.png)
