@@ -113,14 +113,50 @@ Finally, using Gensim's Doc2Vec, I create a [poetry recommendation system](https
 
 ### 3. Modeling
 
+Other than the baseline, my models were consistently better at picking out Pre-1900 poetry, without much confusion between that movement and the other three. Avant-Garde, Metropolitan, and Modern proved more difficult to differentiate and were often confused for each other. The final model seems to suggest that Modern is the closest movement to Pre-1900, with 15% of Modern poems being incorrectly classified as Pre-1900 poems. Avant-Garde and Metropolitan appear very similar to each other, which makes sense from a poetry standpoint.
+
+#### Baseline model
 ![Naive Bayes Confusion Matrix](charts/bnb_combo_cm.png)
 <br/><br/>
+
+- Very much overpredicts on the dominant class.
+- Has decent precision when it does stray from predicting Modern.
+
+#### SVM with TF-IDF vectors and engineered features
 ![SVM TF-IDF Confusion Matrix](charts/svm_combo_untuned_cm.png)
 <br/><br/>
+
+- Very overfit (99.9% F1 on training set and 65.5% on testing set) but a good spread of predictions here compared to the other models.
+- Each category is correctly predicted at least half the time.
+- Pre-1900 poetry is very easily recognized by the model.
+    - Modern poetry appears to be the largest confusing factor here, so must share some similarities with Pre-1900 poetry.
+    - Avant-Garde and Metropolitan are hardly ever predicted for Pre-1900 poems, and Pre-1900 is hardly predicted for Metropolitan and Avant-Garde poems.
+
+#### SVM (tuned) with Doc2Vec embeddings and engineered features
 ![SVM Doc2Vec Tuned Confusion Matrix](charts/svm_doc_tuned_cm.png)
 <br/><br/>
+
+- Using Doc2Vec embeddings instead of sparse word vectors greatly simplifies the model and seems to help it generalize better to unseen data. 
+    - One of the best fitting models (67.0% F1 on training set and 63.9% on testing set), so it should generalize well on unseen data.
+- Every movement still has an accuracy of at least 50%, and an F1 score of at least 55%.
+- Pre-1900 remains very easily identified, and Metropolitan performs better than the other two remaining movements.
+
+#### Final model (same as above) trained on all data
 ![SVM Doc2Vec FINAL Confusion Matrix](charts/svm_doc_FINAL_cm.png)
 <br/><br/>
+
+- After training on all the data, each category achieves an F1 score of at least 0.60.
+    - In the above confusion matrix, each category is correctly identified at least 56% of the time. 
+    - Avant-Garde rises in accuracy considerably.
+
+#### Most important features
+![Top features for the final model](charts/final_model_top_features.png)
+<br/><br/>
+
+- Five out of my seven engineered features make the top ten.
+    - The ratio of end rhymes to total lines, average number of words per line, total lines, lexical richness, and average number of syllables per word.
+    - Polarity and subjectivity scores did not make the cut.
+- The other features are impossible to interpret, being 100 mysterious dimensions created via deep learning.
 
 ### 4. Recommendation system
 
