@@ -13,7 +13,7 @@ import string
 # nlp packages
 import nltk
 from nltk import RegexpTokenizer
-from nltk.stem import WordNetLemmatizer 
+from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet
 from textblob import TextBlob as tb
@@ -21,20 +21,19 @@ import pronouncing
 
 # statistical packages
 from scipy.stats import ttest_ind
-from sklearn.metrics import accuracy_score, f1_score, \
-    classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score, classification_report, \
+    confusion_matrix
 from sklearn.model_selection import cross_val_score
 
 
-    
 # list of roman numerals for stop words
 def roman_numerals():
-    
+
     '''
     Returns a list of Roman numerals, 1-100.
-    
+
     '''
-    
+
     return [
             'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 
             'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 
@@ -56,12 +55,12 @@ def roman_numerals():
 
 # list of possible section headers, to be removed from lines.
 def section_headers():
-    
+
     '''
     Returns a list of possible section headers.
-    
+
     '''
-    
+
     # create a list of section headers to remove
     section_headers = roman_numerals()
     section_headers += [str(i) for i in range(1,101)]
