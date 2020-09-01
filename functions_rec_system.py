@@ -319,6 +319,15 @@ def poem_filter(
         or many end rhymes (`yes`).
         One of ['no', 'yes'].
         
+    
+    Output
+    ------
+    similar_poems : list (tup)
+        Filtered list of tuples with poem index as an integer
+        and percent similarity as a float.
+    
+    Prints a message if similar_poems is empty.
+        
     '''
     
     # genre filter

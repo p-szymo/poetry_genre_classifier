@@ -1,11 +1,5 @@
 # Predicting Poetic Movements
 
-### *NOTE (as of 08/25/2020): I'm currently working on improving this project using more accurately scraped poems. I'm also re-organizing the notebooks, so the modeling and recommendation system notebooks are not currently up to the usual standard.*
-
-### *The app is still useable (and highly, shall we say, recommended). Finally, the conclusions are shaping up to be very similar to what is included in this ReadMe (which will also be revamped).*
-
-### Thanks for understanding :) Without further ado:
-
 ## Summary
 After scraping [Poetry Foundation](https://www.poetryfoundation.org/) for poems within certain genres, I use natural language processing (NLP) techniques to analyze the form, structure, and word usage of four poetic movements: pre-1900 (Victorian and Romantic), Modern (a standalone category), Metropolitan (New York School [1st and 2nd Generation], Confessional, Beat, Harlem Renaissance, Black Arts Movement), and Avant-Garde (Imagist, Black Mountain, Language Poetry, Objectivist).
 
@@ -159,6 +153,25 @@ Other than the baseline, my models were consistently better at picking out Pre-1
 - The other features are impossible to interpret, being 100 mysterious dimensions created via deep learning.
 
 ### 4. Recommendation system
+
+- I built a recommendation system that can take multiple inputs, including a word, a phrase (or block of text), and a poem used in this project:
+    - If the input is a word, the system finds that word's vector (if it is present in my final Doc2Vec model) and compares it to each poem's Doc2Vec document embeddings.
+    - If the input is a phrase, the system uses my final Doc2Vec model to infer a document embedding from the input and compare that to each poem's Doc2Vec document embeddings.
+    - If the input is a poem from the project, the system uses cosine similarity to compare "poem vectors" (my engineered features *plus* Doc2Vec document embeddings).
+
+- I used t-SNE to get a sense of how successful these recommendations may be and found that there is some notable clustering:
+![t-SNE Reduced Dimensions, by Movement](charts/tsne_3d_movement.png)
+<br/><br/>
+
+- There is some pretty decent separation here that fits well with my work during EDA and modeling.
+    - Out of the post-1900 movements, Modern is closest to Pre-1900 poetry.
+    - The post-1900 movements are fairly jumbled, especially when looking at Avant-Garde and Metropolitan genres.
+
+- Looking at it on the specific genre level shows that it will be a more difficult project, should I take that on in the future: 
+![t-SNE Reduced Dimensions, by Genre](charts/tsne_3d_genre.png)
+<br/><br/>
+
+- The results are hard to separate visually (especially since I ran out of unique colors to use), though viewing this alongside the graph separated by movement suggests that there is potentially decent enough separation and clustering here.
 
 # Conclusions
 
