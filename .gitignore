@@ -172,6 +172,7 @@ Untitled.ipynb
 /data/poet_url_dict.pkl
 /data/poem_url_dict.pkl
 /data/poems_df_clean_all.pkl
+/data/all_similarities_list.pkl
 
 # neural net models
 *.h5
