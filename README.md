@@ -213,7 +213,6 @@ I also tried an XGBoost model, which achieved a similar F1 score using the Doc2V
 - **functions_rec_system.py** - file used for building functions for testing in Jupyter notebook
 - **functions_webscraping.py** - file with functions used in webscraping and data cleaning
 - **presentation.pdf** - slides for my presentation of this project
-- **presentation_including_app.pdf** - updated slides for my presentation of this project including an app demo
 - **requirements.txt** - requirement for Heroku deploy
 - **setup.sh** - requirement for Heroku deploy
 - **archives** folder - old jupyter notebooks, mostly scrap
