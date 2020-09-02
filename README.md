@@ -204,13 +204,13 @@ I also tried an XGBoost model, which achieved a similar F1 score using the Doc2V
 - **02_data_cleaning.ipynb** - notebook of cleaning and rescraping poems
 - **03_nlp_features_eda.ipynb** - notebook with feature engineering, EDA, text processing, and charts/visualizations
 - **04_modeling.ipynb** - notebook with Naive Bayes, KNN, Decision Tree, Random Forest, SVM, and Doc2Vec models
-- **05_recommendation_system.ipynb** - notebook with final model training and function building
+- **05_recommendation_system.ipynb** - notebook with cosine similarity, functions tests, and t-SNE visualizations
 - **Procfile** - requirement for Heroku deploy
 - **README.md** - this very file!
 - **app.py** - file with app layout
 - **functions.py** - file with functions used in feature engineering, EDA, modeling, and visualizations for this project
-- **functions_app.py** - file with functions in app
-- **functions_rec_tests.py** - file used for building functions for testing in Jupyter notebook
+- **functions_app.py** - file with functions used in app
+- **functions_rec_system.py** - file used for building functions for testing in Jupyter notebook
 - **functions_webscraping.py** - file with functions used in webscraping and data cleaning
 - **presentation.pdf** - slides for my presentation of this project
 - **presentation_including_app.pdf** - updated slides for my presentation of this project including an app demo

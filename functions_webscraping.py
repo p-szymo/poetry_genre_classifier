@@ -20,6 +20,7 @@ def load_genre_codes():
     '''
     Load a dictionary of codes used by PoetryFoundation.org in
     a genre page's URL.
+
     '''
     
     return {
@@ -51,10 +52,12 @@ def poet_urls_by_genre(genre_code, max_page_num=3):
     Function to scrape PoetryFoundation.org for URLs to the pages
     of each poet within a genre, represented by a genre code.
 
+
     Input
     -----
     genre_code : int
         Code within genre page's URL.
+
     max_page_num : int
         Number of pages to iterate through (default=3).
         As of now, there are no more than 3 pages of poets per 
@@ -68,6 +71,7 @@ def poet_urls_by_genre(genre_code, max_page_num=3):
     NOTE: Selenium is known to encounter issues, sometimes causing
           the function to not work properly. Try re-running if 
           output is not as expected.
+
     '''
 
     # url requirements
@@ -117,10 +121,12 @@ def poem_urls_scraper(poet_url):
     Function to scrape PoetryFoundation.org for the URLs to a 
     poet's poems.
 
+
     Input
     -----
     poet_url : str
         URL to a poet's page.
+
 
     Output
     ------
@@ -132,6 +138,7 @@ def poem_urls_scraper(poet_url):
         images.
         NOTE: It is possible that some of the poems associated
               with these URLs are text-based.
+
     '''
 
     # load a page and soupify it
@@ -175,10 +182,12 @@ def text_poem_scraper(poem_url):
     Returns a dictionary with poet name, poem url, poem title,
     poem as a list of lines, and poem as a single string.
 
+
     Input
     -----
     poem_url : str
         URL to a poem's page.
+
 
     Output
     ------
@@ -196,6 +205,7 @@ def text_poem_scraper(poem_url):
     
     info['poem_string'] : str
         Poem joined with newline characters.
+
     '''
     
     # load a page and soupify it
@@ -296,10 +306,12 @@ def process_image(
     Returns a dictionary with poet name, poem title, poem as a 
     list of lines, and the URL of the possible next page.
 
+
     Input
     -----
     poem_url : str
         URL to a poem's page.
+
         
     Optional input
     --------------
@@ -319,6 +331,7 @@ def process_image(
     next_pattern : str
         Regex pattern for scraping the non-first pages of a poem.
 
+
     Output
     ------
     lines : list (str)
@@ -332,6 +345,7 @@ def process_image(
     
     next_page : str
         URL for the next page of the magazine.
+    
     '''
     
     # load a page and soupify it
@@ -429,6 +443,7 @@ def scan_poem_scraper(
     -----
     poem_url : str
         URL to a poem's page.
+
         
     Optional input
     --------------    
@@ -443,6 +458,7 @@ def scan_poem_scraper(
         
     next_pattern : str
         Regex pattern for scraping the non-first pages of a poem.
+
 
     Output
     ------
@@ -460,6 +476,7 @@ def scan_poem_scraper(
     
     info['poem_string'] : str
         Poem joined with newline characters.
+    
     '''
     
     # scrape first page
@@ -510,6 +527,7 @@ def rescraper(poem_url, mode):
     Returns a tuple with poem as a list of lines and poem as a
     single string.
 
+    
     Input
     -----
     poem_url : str
@@ -519,6 +537,7 @@ def rescraper(poem_url, mode):
         One of ['PoemView', 'poempara', 'p_all', 'justify', 
                 'center'].
          
+    
     Output
     ------
     lines_clean : list (str)
@@ -526,6 +545,7 @@ def rescraper(poem_url, mode):
     
     poem_string : str
         Poem joined with newline characters.
+    
     '''
     
     # load a page and soupify it
@@ -605,16 +625,19 @@ def destringify(x):
     
     Allows for errors, namely those caused by NaN values.
     
+    
     Input
     -----
     x : str
         String with a list inside.
         
+    
     Output
     ------
     x : list
         The list rescued from within a string.
         Returns the input object if an error occurs.
+    
     
     [Code found on Stack Overflow]:
     https://stackoverflow.com/questions/52232742/how-to-use-ast-\
@@ -624,3 +647,4 @@ def destringify(x):
         return literal_eval(x)
     except (ValueError, SyntaxError) as e:
         return x
+        

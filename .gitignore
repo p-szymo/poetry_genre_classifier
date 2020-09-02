@@ -177,3 +177,6 @@ Untitled.ipynb
 # neural net models
 *.h5
 *.hdf5
+
+# old presentation
+presentation_including_app.pdf
