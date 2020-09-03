@@ -235,6 +235,8 @@ def poem_similarity(
                       (df_info.poet == poet)].index[0]
 
     # calculate cosine similarities for that poem
+    # reshape vector to 1 x number_of_columns to plug into
+    # similarity function
     # NOTE: index value should correspond to same poem in
     #       both dataframes
     cos_sims = enumerate(cosine_similarity(
