@@ -7,7 +7,7 @@ Through text processing, feature engineering, and exploratory data analysis, I d
 
 Finally, using Gensim's Doc2Vec, I create a [poetry recommendation system](https://evening-cove-11137.herokuapp.com/), which includes many of my engineered features as optional filter methods.
 
-## To use the app locally, run (after cloning the repo):
+## To use the app locally, run the following in Terminal (after cloning the repo):
 ```streamlit run app.py```
 
 ## Objectives
