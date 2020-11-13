@@ -1039,12 +1039,12 @@ def plot_confusion_matrix(
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 
     # plot
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(15, 12))
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
     tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
+    plt.xticks(tick_marks, classes, rotation=60)
     plt.yticks(tick_marks, classes)
 
     # format true positives and others
