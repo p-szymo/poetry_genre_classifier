@@ -1,7 +1,7 @@
 numpy==1.18.2
 pytesseract==0.3.4
 matplotlib==3.2.1
-requests==2.23.0
+requests==2.31.0
 gensim==3.7.3
 selenium==3.141.0
 pronouncing==0.2.0
